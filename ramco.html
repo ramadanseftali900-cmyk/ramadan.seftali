@@ -212,6 +212,52 @@
 <!-- SES TOGGLE BUTONU -->
 <button class="sound-toggle" id="soundToggle" onclick="sesToggle()">🔊</button>
 
+<!-- AI AYARLARI BUTONU -->
+<button class="ai-ayar-btn" onclick="aiAyarPaneliAc()">🧠 AI</button>
+
+<!-- AI AYARLARI PANELİ -->
+<div id="aiAyarOverlay" onclick="aiAyarPaneliKapat()"></div>
+<div id="aiAyarPanel">
+  <div class="ai-panel-header">
+    <h3>🧠 AI Ayarları</h3>
+    <button onclick="aiAyarPaneliKapat()">✕</button>
+  </div>
+  <div class="ai-panel-icerik">
+    <div class="ai-ayar-grup">
+      <label>🏢 AI Sağlayıcı:</label>
+      <select id="aiSaglayici" onchange="aiModelleriniGuncelle()">
+        <option value="groq">Groq (Ücretsiz - Hızlı)</option>
+        <option value="openai">OpenAI (Ücretli - GPT)</option>
+        <option value="gemini">Google Gemini</option>
+      </select>
+    </div>
+    
+    <div class="ai-ayar-grup">
+      <label>🔑 API Key:</label>
+      <div class="ai-key-input">
+        <input type="password" id="aiApiKey" placeholder="API Key'ini buraya yapıştır...">
+        <button onclick="aiKeyGosterGizle()">👁️</button>
+      </div>
+    </div>
+    
+    <div class="ai-ayar-grup">
+      <label>🤖 Model:</label>
+      <select id="aiModel"></select>
+    </div>
+    
+    <button class="ai-kaydet-btn" onclick="aiAyarlariKaydet()">💾 Kaydet</button>
+    <button class="ai-test-btn" onclick="aiTestEt()">🧪 Test Et</button>
+    
+    <div id="aiDurum" class="ai-durum"></div>
+    
+    <div class="ai-bilgi">
+      <p>📌 <strong>Groq:</strong> <a href="https://console.groq.com/keys" target="_blank">API Key Al</a></p>
+      <p>📌 <strong>OpenAI:</strong> <a href="https://platform.openai.com/api-keys" target="_blank">API Key Al</a></p>
+      <p>📌 <strong>Gemini:</strong> <a href="https://aistudio.google.com/app/apikey" target="_blank">API Key Al</a></p>
+    </div>
+  </div>
+</div>
+
 <!-- ADMİN ÇEKMECESİ BUTONU -->
 <button class="admin-cekmece-btn" onclick="adminCekmeceAc()">⚙️ Admin</button>
 

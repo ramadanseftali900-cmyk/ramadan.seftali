@@ -5,6 +5,32 @@
 // Ayarlar domain-bagla.html sayfasından değiştirilebilir.
 // ============================================
 
+// Firebase ayarları var mı kontrol et
+function firebaseAyarlariVarMi() {
+    var saved = localStorage.getItem('account_settings');
+    if (saved) {
+        try {
+            var s = JSON.parse(saved);
+            if (s.firebaseApiKey && s.firebaseProjectId && s.firebaseDatabaseUrl) {
+                return true;
+            }
+        } catch(e) {}
+    }
+    return false;
+}
+
+// Firebase ayarları yoksa domain-bagla.html'e yönlendir
+// (sadece ana-sayfa ve ürün sayfalarında çalışır, domain-bagla.html'de çalışmaz)
+function firebaseKontrolVeYonlendir() {
+    var currentPage = window.location.pathname.split('/').pop();
+    var muafSayfalar = ['domain-bagla.html', 'index.html', ''];
+    
+    if (!muafSayfalar.includes(currentPage) && !firebaseAyarlariVarMi()) {
+        // Varsayılan değerler kullanılıyor, uyarı göster
+        console.log('⚠️ Firebase ayarları yapılmamış, varsayılan kullanılıyor');
+    }
+}
+
 // localStorage'dan ayarları oku
 function getFirebaseConfig() {
     var saved = localStorage.getItem('account_settings');
@@ -58,6 +84,9 @@ if (typeof firebase !== 'undefined') {
         console.log('✅ Firebase başlatıldı');
     }
     var database = firebase.database();
+    
+    // Firebase ayarları kontrolü
+    firebaseKontrolVeYonlendir();
 }
 
 // ============================================

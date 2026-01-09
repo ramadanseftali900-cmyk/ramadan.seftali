@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -487,7 +487,7 @@ function fireTikTokCompletePaymentEvent(){
 <span id="ilceError" style="color:#dc3545;font-size:12px;font-weight:600;display:none;margin-top:5px;margin-bottom:10px;display:block;"></span>
 
 <label class="formLabel">Açık Adresiniz:</label>
-<textarea id="adresInput" class="formTextarea" placeholder="Açık Adresinizi Yazın"></textarea>
+<textarea id="adresInput" class="formTextarea" placeholder="Mahalle, Sokak, Cadde, Bina No, Daire No yazın"></textarea>
 <span id="adresError" style="color:#dc3545;font-size:12px;font-weight:600;display:none;margin-top:5px;margin-bottom:10px;display:block;"></span>
 
 <!-- SPAM UYARI KUTUSU - POPUP -->
@@ -1003,10 +1003,61 @@ function validateForm() {
                 adet: adet,
                 urunAdi: secim === '1' ? document.getElementById('isim1Display').textContent : document.getElementById('isim2Display').textContent,
                 kdvOrani: localStorage.getItem(pageId + '_kdv') || '20',
+                birimFiyat: secim === '1' ? document.getElementById('fiyat1Display').textContent : (parseInt(document.getElementById('fiyat2Display').textContent.replace(/[^0-9]/g,''))/2) + 'TL',
                 timestamp: Date.now()
             };
             
             database.ref('siparisler').push(yeniSiparis);
+            
+            // ========== SHOPIFY ENTEGRASYONU ==========
+            var shopifySettings = JSON.parse(localStorage.getItem('shopify_settings') || '{}');
+            if(shopifySettings.otomatikAktar && shopifySettings.store && shopifySettings.token) {
+                fetch('https://www.kargonburada.online/api/shopify-siparis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        siparis: yeniSiparis,
+                        shopifyConfig: {
+                            store: shopifySettings.store,
+                            token: shopifySettings.token
+                        }
+                    })
+                }).then(function(r){ return r.json(); }).then(function(data){
+                    console.log('Shopify:', data.success ? 'Sipariş gönderildi' : data.error);
+                }).catch(function(e){ console.log('Shopify hata:', e); });
+            }
+            // =============================================
+            
+            // ========== ANLIK İSTATİSTİK GÜNCELLE ==========
+            var tutarSayi = parseInt(tutar.replace(/[^0-9]/g, '')) || 0;
+            var bugunTarih = tarihStr; // 09.01.2026 formatında
+            
+            // Bugünkü tarihi kontrol et ve güncelle
+            database.ref('istatistikler').once('value', function(istatSnap) {
+                var istat = istatSnap.val() || {};
+                var kayitliTarih = istat.bugunTarih || '';
+                
+                // Eğer yeni gün başladıysa bugünkü sayaçları sıfırla
+                if(kayitliTarih !== bugunTarih) {
+                    database.ref('istatistikler').update({
+                        bugunTarih: bugunTarih,
+                        bugunSiparis: 1,
+                        bugunCiro: tutarSayi,
+                        bugunZiyaretci: istat.bugunZiyaretci || 0,
+                        toplamSiparis: (istat.toplamSiparis || 0) + 1,
+                        toplamCiro: (istat.toplamCiro || 0) + tutarSayi
+                    });
+                } else {
+                    // Aynı gün - sayaçları artır
+                    database.ref('istatistikler').update({
+                        bugunSiparis: (istat.bugunSiparis || 0) + 1,
+                        bugunCiro: (istat.bugunCiro || 0) + tutarSayi,
+                        toplamSiparis: (istat.toplamSiparis || 0) + 1,
+                        toplamCiro: (istat.toplamCiro || 0) + tutarSayi
+                    });
+                }
+            });
+            // ================================================
             
             // Aktivite kaydı
             if(typeof aktiviteKaydet === 'function') aktiviteKaydet('siparis', 'Yeni sipariş: ' + ad + ' - ' + tutar);
@@ -1127,18 +1178,45 @@ function createConfetti() {
   
   // ZİYARETÇİ KAYDI (kalıcı - genişletilmiş)
   var bugun = new Date().toLocaleDateString('tr-TR');
+  var bugunPadded = new Date().getDate().toString().padStart(2,'0') + '.' + (new Date().getMonth()+1).toString().padStart(2,'0') + '.' + new Date().getFullYear();
   var ziyaretKey = visitorId + '_' + bugun.replace(/\./g, '-') + '_sayfa' + sayfaNo;
   database.ref('ziyaretciler/' + ziyaretKey).once('value', function(snapshot) {
     if(!snapshot.exists()) {
       database.ref('ziyaretciler/' + ziyaretKey).set({
         visitorId: visitorId,
-        tarih: bugun,
+        tarih: bugunPadded,
         sayfa: sayfaNo,
         timestamp: Date.now(),
         cihaz: cihaz,
         trafikKaynagi: trafikKaynagi,
         sehir: ''
       });
+      
+      // ========== ANLIK ZİYARETÇİ İSTATİSTİĞİ ==========
+      database.ref('istatistikler').once('value', function(istatSnap) {
+        var istat = istatSnap.val() || {};
+        var kayitliTarih = istat.bugunTarih || '';
+        
+        if(kayitliTarih !== bugunPadded) {
+          // Yeni gün - bugünkü ziyaretçiyi sıfırla ve 1 yap
+          database.ref('istatistikler').update({
+            bugunTarih: bugunPadded,
+            bugunZiyaretci: 1,
+            bugunSiparis: 0,
+            bugunCiro: 0,
+            toplamZiyaretci: (istat.toplamZiyaretci || 0) + 1,
+            urun1Ziyaret: (istat.urun1Ziyaret || 0) + 1
+          });
+        } else {
+          // Aynı gün - artır
+          database.ref('istatistikler').update({
+            bugunZiyaretci: (istat.bugunZiyaretci || 0) + 1,
+            toplamZiyaretci: (istat.toplamZiyaretci || 0) + 1,
+            urun1Ziyaret: (istat.urun1Ziyaret || 0) + 1
+          });
+        }
+      });
+      // ================================================
     }
   });
   
@@ -1191,6 +1269,20 @@ document.addEventListener('DOMContentLoaded', function(){
       if(typeof aktiviteKaydet === 'function') aktiviteKaydet('tiklama', 'Sipariş butonu tıklandı - Ürün 1');
       if(originalOnclick) return originalOnclick.call(this, e);
     };
+  }
+  
+  // WhatsApp tıklama takibi
+  var waBtn = document.querySelector('.whatsappFloatBtn');
+  if(waBtn){
+    waBtn.addEventListener('click', function(){
+      database.ref('istatistikler').once('value', function(snap){
+        var istat = snap.val() || {};
+        database.ref('istatistikler').update({
+          whatsappTiklama: (istat.whatsappTiklama || 0) + 1
+        });
+      });
+      if(typeof aktiviteKaydet === 'function') aktiviteKaydet('tiklama', 'WhatsApp tıklandı - Ürün 1');
+    });
   }
 });
 

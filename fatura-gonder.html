@@ -87,6 +87,88 @@ body{font-family:Arial,sans-serif;background:#1B5E20;min-height:100vh;color:#fff
 </div>
 </div>
 
+<!-- FATURA DETAY POPUP -->
+<div id="faturaDetayPopup" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;">
+<div style="background:#fff;border-radius:15px;padding:25px;max-width:500px;width:90%;color:#000;position:relative;max-height:90vh;overflow-y:auto;">
+<button onclick="faturaDetayKapat()" style="position:absolute;top:10px;right:15px;background:#dc3545;color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:bold;">✕</button>
+<h3 style="color:#17a2b8;margin-bottom:20px;font-size:18px;">🧾 Fatura Detayları</h3>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Fatura Tipi</label>
+<select id="faturaDetayTip" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;">
+<option value="SATIS">Satış Faturası</option>
+<option value="IADE">İade Faturası</option>
+</select>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Fatura Senaryosu</label>
+<select id="faturaDetaySenaryo" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;">
+<option value="EARSIVFATURA">e-Arşiv Fatura (Bireysel)</option>
+<option value="TICARIFATURA">Ticari Fatura (Kurumsal)</option>
+</select>
+</div>
+
+<div id="kurumsalAlani" style="display:none;background:#e3f2fd;padding:15px;border-radius:8px;margin-bottom:15px;">
+<h4 style="color:#1565c0;margin-bottom:10px;font-size:14px;">🏢 Kurumsal Müşteri Bilgileri</h4>
+<div style="margin-bottom:10px;">
+<label style="display:block;font-size:12px;font-weight:bold;color:#333;margin-bottom:3px;">Firma Unvanı</label>
+<input type="text" id="faturaDetayFirmaUnvan" placeholder="Müşteri firma adı" style="width:100%;padding:10px;border:1px solid #1565c0;border-radius:6px;font-size:13px;">
+</div>
+<div style="margin-bottom:10px;">
+<label style="display:block;font-size:12px;font-weight:bold;color:#333;margin-bottom:3px;">Vergi Dairesi</label>
+<input type="text" id="faturaDetayMusteriVergiDairesi" placeholder="Müşteri vergi dairesi" style="width:100%;padding:10px;border:1px solid #1565c0;border-radius:6px;font-size:13px;">
+</div>
+<div style="margin-bottom:10px;">
+<label style="display:block;font-size:12px;font-weight:bold;color:#333;margin-bottom:3px;">VKN (Vergi Kimlik No)</label>
+<input type="text" id="faturaDetayMusteriVKN" placeholder="10 haneli vergi no" maxlength="11" style="width:100%;padding:10px;border:1px solid #1565c0;border-radius:6px;font-size:13px;">
+</div>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Müşteri TC Kimlik No (Bireysel)</label>
+<input type="text" id="faturaDetayMusteriTC" placeholder="11 haneli TC kimlik no" maxlength="11" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;">
+<small style="color:#888;font-size:11px;">e-Arşiv fatura için zorunlu değil ama önerilir</small>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Birim Fiyat (KDV Hariç)</label>
+<input type="number" id="faturaDetayBirimFiyat" placeholder="Tek ürün fiyatı" step="0.01" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;">
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Ödeme Şekli</label>
+<select id="faturaDetayOdeme" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;">
+<option value="NAKIT">Nakit</option>
+<option value="KREDIKARTI">Kredi Kartı</option>
+<option value="HAVALE">Havale/EFT</option>
+<option value="CEKSENET">Çek/Senet</option>
+</select>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Fatura Notu (Opsiyonel)</label>
+<textarea id="faturaDetayNot" placeholder="Faturaya eklenecek not..." rows="2" style="width:100%;padding:12px;border:2px solid #17a2b8;border-radius:8px;font-size:14px;resize:none;"></textarea>
+</div>
+
+<button onclick="faturaDetayKaydetVeKes()" style="width:100%;background:#17a2b8;color:#fff;border:none;padding:15px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">🧾 FATURA KES</button>
+</div>
+</div>
+<script>
+// Fatura senaryosu değişince kurumsal alanını göster/gizle
+document.getElementById('faturaDetaySenaryo').addEventListener('change', function(){
+var kurumsalAlani = document.getElementById('kurumsalAlani');
+var tcAlani = document.getElementById('faturaDetayMusteriTC').parentElement;
+if(this.value === 'TICARIFATURA'){
+kurumsalAlani.style.display = 'block';
+tcAlani.style.display = 'none';
+} else {
+kurumsalAlani.style.display = 'none';
+tcAlani.style.display = 'block';
+}
+});
+</script>
+
 <div class="container">
 <!-- ŞİRKETLER BUTONU -->
 <button class="sirketlerBtn" id="sirketlerBtn" onclick="cekmeceToggle()">ŞİRKETLER</button>
@@ -501,20 +583,23 @@ var adet = siparis.adet || '1';
 if(adet === '1') adet = '1 Adet';
 if(adet === '2') adet = '2 Adet';
 var durum = siparis.faturaKesildi ? 'Faturalı' : 'Bekliyor';
+var durumClass = siparis.faturaKesildi ? 'badge-faturalandi' : 'badge-bekliyor';
+
+// KDV Oranı (önce tanımla!)
+var kdvOrani = siparis.kdvOrani || '20';
+var kdvOraniNum = parseInt(kdvOrani);
+if(isNaN(kdvOraniNum)) kdvOraniNum = 20;
+
 // KDV Hesaplama
 var tutarStr = siparis.tutar || '0';
 var tutarNum = parseFloat(tutarStr.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
-var kdvOraniNum = parseInt(kdvOrani) || 20;
 var kdvCarpan = 1 + (kdvOraniNum / 100);
 var kdvHaric = tutarNum / kdvCarpan;
 var kdvTutari = tutarNum - kdvHaric;
 var kdvHaricStr = kdvHaric.toFixed(2) + ' TL';
 var kdvTutariStr = kdvTutari.toFixed(2) + ' TL';
 
-var durumClass = siparis.faturaKesildi ? 'badge-faturalandi' : 'badge-bekliyor';
-var kdvOrani = siparis.kdvOrani || '20';
-
-tr.innerHTML = '<td>'+siparis.siparisNo+'</td><td>'+siparis.tarih+'</td><td>'+siparis.musteri+'</td><td>'+siparis.telefon+'</td><td>'+(siparis.il||'-')+'</td><td>'+(siparis.ilce||'-')+'</td><td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="adresLink" onclick="adresGoster(\''+(siparis.adres||'-').replace(/'/g, "\\'")+'\')">'+( siparis.adres||'-')+'</span></td><td><select class="kdvSelect" data-key="'+siparis.key+'" onchange="kdvDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="20" '+(kdvOrani==='20'?'selected':'')+'>%20</option><option value="10" '+(kdvOrani==='10'?'selected':'')+'>%10</option><option value="1" '+(kdvOrani==='1'?'selected':'')+'>%1</option><option value="0" '+(kdvOrani==='0'?'selected':'')+'>%0</option></select></td><td>'+(siparis.urunAdi||'-')+'</td><td>'+adet+'</td><td>'+odemeYontemi+'</td><td>'+siparis.tutar+'</td><td>'+kdvHaricStr+'</td><td>'+kdvTutariStr+'</td><td><span class="badge '+durumClass+'">'+durum+'</span></td><td><button class="islemBtn faturaBtn" onclick="faturaKes(\''+siparis.key+'\')">FATURA</button></td><td><button class="islemBtn silBtn" onclick="siparisiSil(\''+siparis.key+'\')">SİL</button></td>';
+tr.innerHTML = '<td>'+siparis.siparisNo+'</td><td>'+siparis.tarih+'</td><td>'+siparis.musteri+'</td><td>'+siparis.telefon+'</td><td>'+(siparis.il||'-')+'</td><td>'+(siparis.ilce||'-')+'</td><td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="adresLink" onclick="adresGoster(\''+(siparis.adres||'-').replace(/'/g, "\\'")+'\')">'+( siparis.adres||'-')+'</span></td><td><select class="kdvSelect" data-key="'+siparis.key+'" onchange="kdvDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="20" '+(kdvOrani==='20'?'selected':'')+'>%20</option><option value="10" '+(kdvOrani==='10'?'selected':'')+'>%10</option><option value="1" '+(kdvOrani==='1'?'selected':'')+'>%1</option><option value="0" '+(kdvOrani==='0'?'selected':'')+'>%0</option></select></td><td>'+(siparis.urunAdi||'-')+'</td><td>'+adet+'</td><td>'+odemeYontemi+'</td><td>'+siparis.tutar+'</td><td>'+kdvHaricStr+'</td><td>'+kdvTutariStr+'</td><td><span class="badge '+durumClass+'">'+durum+'</span></td><td><button class="islemBtn faturaBtn" onclick="faturaDetayAc(\''+siparis.key+'\')">FATURA</button></td><td><button class="islemBtn silBtn" onclick="siparisiSil(\''+siparis.key+'\')">SİL</button></td>';
 tbody.appendChild(tr);
 });
 });
@@ -529,6 +614,95 @@ function adresPopupKapat(){
 document.getElementById('adresPopup').classList.remove('show');
 }
 
+var seciliFaturaKey = null;
+
+function faturaDetayAc(key){
+if(!seciliFaturaFirma || !seciliFaturaFirmaBilgi){
+alert('Lütfen önce sol taraftan bir fatura şirketi seçin!');
+cekmeceToggle();
+return;
+}
+
+if(!firmaBilgileri || !firmaBilgileri.firmaAdi){
+alert('Lütfen önce firma bilgilerinizi (senin bilgilerin) girin!');
+cekmeceToggle();
+return;
+}
+
+seciliFaturaKey = key;
+
+// Sipariş bilgilerini al ve popup'ı doldur
+database.ref('siparisler/' + key).once('value', function(snapshot){
+var siparis = snapshot.val();
+if(!siparis){
+alert('❌ Sipariş bulunamadı!');
+return;
+}
+
+// Varsayılan değerleri doldur
+document.getElementById('faturaDetayTip').value = siparis.faturaTipi || 'SATIS';
+document.getElementById('faturaDetaySenaryo').value = siparis.faturaSenaryosu || 'EARSIVFATURA';
+document.getElementById('faturaDetayMusteriTC').value = siparis.musteriTC || '';
+document.getElementById('faturaDetayFirmaUnvan').value = siparis.musteriFirmaUnvan || '';
+document.getElementById('faturaDetayMusteriVergiDairesi').value = siparis.musteriVergiDairesi || '';
+document.getElementById('faturaDetayMusteriVKN').value = siparis.musteriVKN || '';
+
+// Birim fiyat hesapla
+var tutarNum = parseFloat(siparis.tutar.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
+var adetNum = parseInt(siparis.adet) || 1;
+var kdvOrani = parseInt(siparis.kdvOrani) || 20;
+var kdvCarpan = 1 + (kdvOrani / 100);
+var birimFiyatKdvHaric = (tutarNum / kdvCarpan) / adetNum;
+document.getElementById('faturaDetayBirimFiyat').value = birimFiyatKdvHaric.toFixed(2);
+
+// Ödeme şekli
+var odeme = siparis.odemeYontemi || 'Nakit';
+if(odeme === 'Nakit' || odeme === 'Kapıda Nakit') document.getElementById('faturaDetayOdeme').value = 'NAKIT';
+else if(odeme === 'Kredi Kartı' || odeme === 'Kapıda Kredi Kartı') document.getElementById('faturaDetayOdeme').value = 'KREDIKARTI';
+else document.getElementById('faturaDetayOdeme').value = 'NAKIT';
+
+// Popup'ı göster
+document.getElementById('faturaDetayPopup').style.display = 'flex';
+});
+}
+
+function faturaDetayKapat(){
+document.getElementById('faturaDetayPopup').style.display = 'none';
+seciliFaturaKey = null;
+}
+
+function faturaDetayKaydetVeKes(){
+if(!seciliFaturaKey) return;
+
+var faturaTipi = document.getElementById('faturaDetayTip').value;
+var faturaSenaryosu = document.getElementById('faturaDetaySenaryo').value;
+var musteriTC = document.getElementById('faturaDetayMusteriTC').value;
+var musteriFirmaUnvan = document.getElementById('faturaDetayFirmaUnvan').value;
+var musteriVergiDairesi = document.getElementById('faturaDetayMusteriVergiDairesi').value;
+var musteriVKN = document.getElementById('faturaDetayMusteriVKN').value;
+var birimFiyat = document.getElementById('faturaDetayBirimFiyat').value;
+var odemeYontemi = document.getElementById('faturaDetayOdeme').value;
+var faturaNotu = document.getElementById('faturaDetayNot').value;
+
+// Firebase'e fatura detaylarını kaydet
+database.ref('siparisler/' + seciliFaturaKey).update({
+faturaTipi: faturaTipi,
+faturaSenaryosu: faturaSenaryosu,
+musteriTC: musteriTC,
+musteriFirmaUnvan: musteriFirmaUnvan,
+musteriVergiDairesi: musteriVergiDairesi,
+musteriVKN: musteriVKN,
+birimFiyatKdvHaric: birimFiyat,
+faturaOdemeYontemi: odemeYontemi,
+faturaNotu: faturaNotu
+}).then(function(){
+// Popup'ı kapat
+faturaDetayKapat();
+// Asıl fatura kesme işlemini başlat
+faturaKes(seciliFaturaKey);
+});
+}
+
 function faturaKes(key){
 if(!seciliFaturaFirma || !seciliFaturaFirmaBilgi){
 alert('Lütfen önce sol taraftan bir fatura şirketi seçin!');
@@ -539,8 +713,6 @@ if(!firmaBilgileri || !firmaBilgileri.firmaAdi){
 alert('Lütfen önce firma bilgilerinizi (senin bilgilerin) girin!');
 return;
 }
-
-if(!confirm('Bu sipariş için fatura kesilecek. Onaylıyor musunuz?')) return;
 
 // Sipariş bilgilerini al
 database.ref('siparisler/' + key).once('value', function(snapshot){
@@ -579,18 +751,26 @@ ad: siparis.musteri,
 telefon: siparis.telefon,
 il: siparis.il || '',
 ilce: siparis.ilce || '',
-adres: siparis.adres || ''
+mahalle: siparis.mahalle || '',
+adres: siparis.adres || '',
+tcKimlikNo: siparis.musteriTC || '',
+firmaUnvan: siparis.musteriFirmaUnvan || '',
+vergiDairesi: siparis.musteriVergiDairesi || '',
+vkn: siparis.musteriVKN || ''
 },
 // Fatura Bilgileri
 fatura: {
 siparisNo: siparis.siparisNo,
 tarih: new Date().toISOString(),
+tip: siparis.faturaTipi || 'SATIS',
+senaryo: siparis.faturaSenaryosu || 'EARSIVFATURA',
 urunAdi: siparis.urunAdi || 'Ürün',
 adet: siparis.adet || '1',
-birimFiyat: siparis.tutar,
+birimFiyat: siparis.birimFiyatKdvHaric || siparis.tutar,
 toplamTutar: siparis.tutar,
 kdvOrani: siparis.kdvOrani || '20',
-odemeYontemi: siparis.odemeYontemi || 'Nakit'
+odemeYontemi: siparis.faturaOdemeYontemi || 'NAKIT',
+not: siparis.faturaNotu || ''
 }
 };
 
@@ -677,6 +857,8 @@ database.ref('siparisler/' + key).update({
 kdvOrani: deger
 }).then(function(){
 console.log('KDV güncellendi: %' + deger);
+// Tabloyu yenile
+siparisleriYukle();
 }).catch(function(error){
 alert('❌ Hata: ' + error.message);
 });

@@ -120,6 +120,62 @@ body{font-family:Arial,sans-serif;background:#1B5E20;min-height:100vh;color:#fff
 </div>
 </div>
 
+<!-- KARGO DETAY POPUP -->
+<div id="kargoDetayPopup" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;">
+<div style="background:#fff;border-radius:15px;padding:25px;max-width:450px;width:90%;color:#000;position:relative;">
+<button onclick="kargoDetayKapat()" style="position:absolute;top:10px;right:15px;background:#dc3545;color:#fff;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:bold;">✕</button>
+<h3 style="color:#1B5E20;margin-bottom:20px;font-size:18px;">📦 Kargo Detayları</h3>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Desi (Hacim Ağırlığı)</label>
+<input type="number" id="kargoDetayDesi" placeholder="Örn: 1, 2, 3..." min="1" style="width:100%;padding:12px;border:2px solid #28a745;border-radius:8px;font-size:14px;">
+<small style="color:#888;font-size:11px;">En x Boy x Yükseklik / 3000 = Desi</small>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Ağırlık (kg)</label>
+<input type="number" id="kargoDetayAgirlik" placeholder="Örn: 0.5, 1, 2..." step="0.1" min="0.1" style="width:100%;padding:12px;border:2px solid #28a745;border-radius:8px;font-size:14px;">
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Kargo Ödemesi</label>
+<select id="kargoDetayOdeme" style="width:100%;padding:12px;border:2px solid #28a745;border-radius:8px;font-size:14px;">
+<option value="gonderen">Gönderici Öder</option>
+<option value="alici">Alıcı Öder (Kapıda Ödeme)</option>
+</select>
+</div>
+
+<div id="tahsilatAlani" style="margin-bottom:15px;display:none;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Tahsilat Tutarı (TL)</label>
+<input type="number" id="kargoDetayTahsilat" placeholder="Kapıda tahsil edilecek tutar" min="0" style="width:100%;padding:12px;border:2px solid #ffc107;border-radius:8px;font-size:14px;background:#fffde7;">
+<small style="color:#888;font-size:11px;">Kapıda ödemeli ise müşteriden alınacak tutar</small>
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Kargo İçeriği</label>
+<input type="text" id="kargoDetayIcerik" placeholder="Örn: Elektronik Ürün, Giyim, vb." style="width:100%;padding:12px;border:2px solid #28a745;border-radius:8px;font-size:14px;">
+</div>
+
+<div style="margin-bottom:15px;">
+<label style="display:block;font-size:13px;font-weight:bold;color:#333;margin-bottom:5px;">Paket Adedi</label>
+<input type="number" id="kargoDetayPaketAdet" value="1" min="1" style="width:100%;padding:12px;border:2px solid #28a745;border-radius:8px;font-size:14px;">
+</div>
+
+<button onclick="kargoDetayKaydetVeGonder()" style="width:100%;background:#28a745;color:#fff;border:none;padding:15px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">🚚 KARGOYA VER</button>
+</div>
+</div>
+<script>
+// Kargo ödeme seçimi değişince tahsilat alanını göster/gizle
+document.getElementById('kargoDetayOdeme').addEventListener('change', function(){
+var tahsilatAlani = document.getElementById('tahsilatAlani');
+if(this.value === 'alici'){
+tahsilatAlani.style.display = 'block';
+} else {
+tahsilatAlani.style.display = 'none';
+}
+});
+</script>
+
 <div class="container">
 <!-- ŞİRKETLER BUTONU -->
 <button class="sirketlerBtn" id="sirketlerBtn" onclick="cekmeceToggle()">ŞİRKETLER</button>
@@ -671,7 +727,7 @@ var kargoOdemesi = siparis.kargoOdemesi || 'gonderen';
 var kargoOdemesiText = kargoOdemesi === 'gonderen' ? 'Gönderici' : 'Alıcı';
 var kdvOrani = siparis.kdvOrani || '20';
 
-tr.innerHTML = '<td>'+siparis.siparisNo+'</td><td>'+siparis.tarih+'</td><td>'+siparis.musteri+'</td><td>'+siparis.telefon+'</td><td>'+(siparis.il||'-')+'</td><td>'+(siparis.ilce||'-')+'</td><td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="adresLink" onclick="adresGoster(\''+(siparis.adres||'-').replace(/'/g, "\\'")+'\', \''+siparis.key+'\')">'+(siparis.adres||'-')+'</span></td><td><select class="kdvSelect" data-key="'+siparis.key+'" onchange="kdvDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="20" '+(kdvOrani==='20'?'selected':'')+'>%20</option><option value="10" '+(kdvOrani==='10'?'selected':'')+'>%10</option><option value="1" '+(kdvOrani==='1'?'selected':'')+'>%1</option><option value="0" '+(kdvOrani==='0'?'selected':'')+'>%0</option></select></td><td>'+(siparis.urunAdi||'-')+'</td><td>'+adet+'</td><td>'+odemeYontemi+'</td><td>'+siparis.tutar+'</td><td><select class="kargoOdemesiSelect" data-key="'+siparis.key+'" onchange="kargoOdemesiDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="gonderen" '+(kargoOdemesi==='gonderen'?'selected':'')+'>Gönderici</option><option value="alici" '+(kargoOdemesi==='alici'?'selected':'')+'>Alıcı</option></select></td><td><span class="badge badge-bekliyor">Kargo Bekliyor</span></td><td><button class="islemBtn kargoBtn" onclick="kargoGonder(\''+siparis.key+'\')">GÖNDER</button><button class="islemBtn silBtn" onclick="siparisiSilDirekt(\''+siparis.key+'\')">SİL</button></td>';
+tr.innerHTML = '<td>'+siparis.siparisNo+'</td><td>'+siparis.tarih+'</td><td>'+siparis.musteri+'</td><td>'+siparis.telefon+'</td><td>'+(siparis.il||'-')+'</td><td>'+(siparis.ilce||'-')+'</td><td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="adresLink" onclick="adresGoster(\''+(siparis.adres||'-').replace(/'/g, "\\'")+'\', \''+siparis.key+'\')">'+(siparis.adres||'-')+'</span></td><td><select class="kdvSelect" data-key="'+siparis.key+'" onchange="kdvDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="20" '+(kdvOrani==='20'?'selected':'')+'>%20</option><option value="10" '+(kdvOrani==='10'?'selected':'')+'>%10</option><option value="1" '+(kdvOrani==='1'?'selected':'')+'>%1</option><option value="0" '+(kdvOrani==='0'?'selected':'')+'>%0</option></select></td><td>'+(siparis.urunAdi||'-')+'</td><td>'+adet+'</td><td>'+odemeYontemi+'</td><td>'+siparis.tutar+'</td><td><select class="kargoOdemesiSelect" data-key="'+siparis.key+'" onchange="kargoOdemesiDegistir(this)" style="padding:5px;border-radius:5px;border:1px solid #ddd;font-size:11px;cursor:pointer;"><option value="gonderen" '+(kargoOdemesi==='gonderen'?'selected':'')+'>Gönderici</option><option value="alici" '+(kargoOdemesi==='alici'?'selected':'')+'>Alıcı</option></select></td><td><span class="badge badge-bekliyor">Kargo Bekliyor</span></td><td><button class="islemBtn kargoBtn" onclick="kargoDetayAc(\''+siparis.key+'\')">GÖNDER</button><button class="islemBtn silBtn" onclick="siparisiSilDirekt(\''+siparis.key+'\')">SİL</button></td>';
 tbody.appendChild(tr);
 });
 });
@@ -741,6 +797,81 @@ alert('❌ Hata: ' + error.message);
 });
 }
 
+var seciliKargoKey = null;
+
+function kargoDetayAc(key){
+if(!seciliFirma || !seciliFirmaBilgi){
+alert('⚠️ Lütfen önce sol taraftan bir kargo firması seçin!\n\nŞİRKETLER butonuna tıklayıp bir firma seçin.');
+cekmeceToggle();
+return;
+}
+
+if(!gonderici || !gonderici.ad){
+alert('⚠️ Lütfen önce gönderici bilgilerinizi girin!\n\nŞİRKETLER butonuna tıklayıp "GÖNDERİCİ BİLGİLERİ" bölümünü doldurun.');
+cekmeceToggle();
+return;
+}
+
+seciliKargoKey = key;
+
+// Sipariş bilgilerini al ve popup'ı doldur
+database.ref('siparisler/' + key).once('value', function(snapshot){
+var siparis = snapshot.val();
+if(!siparis){
+alert('❌ Sipariş bulunamadı!');
+return;
+}
+
+// Varsayılan değerleri doldur
+document.getElementById('kargoDetayDesi').value = siparis.desi || '1';
+document.getElementById('kargoDetayAgirlik').value = siparis.agirlik || '0.5';
+document.getElementById('kargoDetayOdeme').value = siparis.kargoOdemesi || 'gonderen';
+document.getElementById('kargoDetayTahsilat').value = siparis.tutar ? siparis.tutar.replace(/[^0-9]/g,'') : '';
+document.getElementById('kargoDetayIcerik').value = siparis.urunAdi || 'Ürün';
+document.getElementById('kargoDetayPaketAdet').value = siparis.adet ? siparis.adet.replace(/[^0-9]/g,'') : '1';
+
+// Kapıda ödeme ise tahsilat alanını göster
+if(siparis.odemeYontemi === 'Nakit' || siparis.odemeYontemi === 'Kredi Kartı'){
+document.getElementById('kargoDetayOdeme').value = 'alici';
+document.getElementById('tahsilatAlani').style.display = 'block';
+}
+
+// Popup'ı göster
+document.getElementById('kargoDetayPopup').style.display = 'flex';
+});
+}
+
+function kargoDetayKapat(){
+document.getElementById('kargoDetayPopup').style.display = 'none';
+seciliKargoKey = null;
+}
+
+function kargoDetayKaydetVeGonder(){
+if(!seciliKargoKey) return;
+
+var desi = document.getElementById('kargoDetayDesi').value || '1';
+var agirlik = document.getElementById('kargoDetayAgirlik').value || '0.5';
+var kargoOdemesi = document.getElementById('kargoDetayOdeme').value;
+var tahsilat = document.getElementById('kargoDetayTahsilat').value || '0';
+var icerik = document.getElementById('kargoDetayIcerik').value || 'Ürün';
+var paketAdet = document.getElementById('kargoDetayPaketAdet').value || '1';
+
+// Firebase'e kargo detaylarını kaydet
+database.ref('siparisler/' + seciliKargoKey).update({
+desi: desi,
+agirlik: agirlik,
+kargoOdemesi: kargoOdemesi,
+tahsilatTutari: tahsilat,
+kargoIcerigi: icerik,
+paketAdedi: paketAdet
+}).then(function(){
+// Popup'ı kapat
+kargoDetayKapat();
+// Asıl kargo gönderme işlemini başlat
+kargoGonder(seciliKargoKey);
+});
+}
+
 function kargoGonder(key){
 if(!seciliFirma || !seciliFirmaBilgi){
 alert('⚠️ Lütfen önce sol taraftan bir kargo firması seçin!\n\nŞİRKETLER butonuna tıklayıp bir firma seçin.');
@@ -789,6 +920,7 @@ ad: siparis.musteri,
 telefon: siparis.telefon,
 il: siparis.il || '',
 ilce: siparis.ilce || '',
+mahalle: siparis.mahalle || '',
 adres: siparis.adres || ''
 },
 // Kargo Bilgileri

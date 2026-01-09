@@ -49,6 +49,7 @@ html,body{margin:0;padding:0}
 <div id="drawerButtons">
 <button class="drawerBtn" style="background:#000" onclick="window.location.href='tiktok-pixel.html'">TikTok Pixel</button>
 <button class="drawerBtn" style="background:#0095F6" onclick="window.location.href='meta-pixel.html'">Meta Pixel</button>
+<button class="drawerBtn" style="background:#96bf3d" onclick="window.location.href='shopify-ayarlar.html'">🛒 Shopify</button>
 <button class="drawerBtn" style="background:#9C27B0" onclick="window.location.href='domain-bagla.html'">Domain Bağla</button>
 <button class="drawerBtn" style="background:#FFC107;color:#000" onclick="window.location.href='muhasebeci.html'">MUHASEBE</button>
 <button class="drawerBtn" style="background:#1B5E20" onclick="window.location.href='gelen-fatura.html'">Gelen Faturalar</button>
@@ -287,10 +288,18 @@ window.addEventListener('load', sayfaDurumlariniYukle);
 
 <!-- ÜST BAR - CANLI -->
 <div style="background:rgba(0,0,0,0.5);border:1px solid #28a745;border-radius:15px;padding:15px 25px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px">
-<div style="display:flex;align-items:center;gap:10px">
-<div id="onlineDot" style="width:12px;height:12px;background:#28a745;border-radius:50%;animation:pulse 2s infinite"></div>
-<span style="font-size:18px;font-weight:bold">CANLI: <span id="onlineCount" style="color:#28a745">0</span> kişi online</span>
+<div style="display:flex;align-items:center;gap:15px">
+<div id="onlineDot" style="width:16px;height:16px;background:#00ff00;border-radius:50%;animation:pulse 1.5s infinite;box-shadow:0 0 15px #00ff00"></div>
+<span style="font-size:16px;font-weight:bold;color:#aaa">CANLI:</span>
+<span id="onlineCount" style="font-size:42px;font-weight:900;color:#00ff00;text-shadow:0 0 20px #00ff00,0 0 40px #00ff00;animation:glowPulse 2s ease-in-out infinite">0</span>
+<span style="font-size:16px;font-weight:bold;color:#aaa">kişi online</span>
 </div>
+<style>
+@keyframes glowPulse {
+  0%, 100% { text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00; }
+  50% { text-shadow: 0 0 30px #00ff00, 0 0 60px #00ff00, 0 0 80px #00ff00; }
+}
+</style>
 <div style="font-size:14px;color:#888" id="currentDateTime"></div>
 </div>
 
@@ -451,16 +460,68 @@ window.addEventListener('load', sayfaDurumlariniYukle);
 <div style="font-size:18px;font-weight:bold;margin-bottom:20px;display:flex;align-items:center;gap:10px">
 <span>📊</span> HAFTALIK SATIŞ GRAFİĞİ
 </div>
-<div style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;padding:10px 0">
-<div style="text-align:center"><div id="bar1" style="width:40px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;height:60px"></div><div style="font-size:11px;color:#888;margin-top:5px">Pzt</div></div>
-<div style="text-align:center"><div id="bar2" style="width:40px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;height:90px"></div><div style="font-size:11px;color:#888;margin-top:5px">Sal</div></div>
-<div style="text-align:center"><div id="bar3" style="width:40px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;height:45px"></div><div style="font-size:11px;color:#888;margin-top:5px">Çar</div></div>
-<div style="text-align:center"><div id="bar4" style="width:40px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;height:120px"></div><div style="font-size:11px;color:#888;margin-top:5px">Per</div></div>
-<div style="text-align:center"><div id="bar5" style="width:40px;background:linear-gradient(180deg,#667eea,#764ba2);border-radius:5px 5px 0 0;height:80px"></div><div style="font-size:11px;color:#888;margin-top:5px">Cum</div></div>
-<div style="text-align:center"><div id="bar6" style="width:40px;background:linear-gradient(180deg,#43e97b,#38f9d7);border-radius:5px 5px 0 0;height:140px"></div><div style="font-size:11px;color:#888;margin-top:5px">Cmt</div></div>
-<div style="text-align:center"><div id="bar7" style="width:40px;background:linear-gradient(180deg,#fa709a,#fee140);border-radius:5px 5px 0 0;height:100px"></div><div style="font-size:11px;color:#888;margin-top:5px">Paz</div></div>
+<div id="weeklyChart" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;padding:10px 0">
 </div>
 </div>
+<script>
+// Haftalık satış grafiği - Firebase'den veri çeker
+function haftalikGrafigiBagla() {
+  if(typeof database === 'undefined') {
+    setTimeout(haftalikGrafigiBagla, 500);
+    return;
+  }
+  var gunAdlari = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  var bugun = new Date();
+  var bugunIndex = bugun.getDay(); // 0=Pazar
+  if(bugunIndex === 0) bugunIndex = 7; // Pazar'ı 7 yap
+  
+  // Son 7 günün tarihlerini hesapla (Pazartesi'den bugüne)
+  var haftaninGunleri = {};
+  for(var i=0; i<7; i++) {
+    var gun = new Date();
+    var fark = bugunIndex - 1 - i; // Pazartesi'den başla
+    gun.setDate(bugun.getDate() - fark);
+    var tarihStr = gun.getDate().toString().padStart(2,'0') + '.' + (gun.getMonth()+1).toString().padStart(2,'0') + '.' + gun.getFullYear();
+    haftaninGunleri[tarihStr] = i; // tarih -> gün indexi
+  }
+  
+  database.ref('siparisler').on('value', function(snapshot) {
+    var gunlukSatis = [0,0,0,0,0,0,0]; // Pzt-Paz
+    
+    snapshot.forEach(function(child) {
+      var siparis = child.val();
+      if(siparis && siparis.tarih) {
+        var tarih = siparis.tarih;
+        if(haftaninGunleri.hasOwnProperty(tarih)) {
+          gunlukSatis[haftaninGunleri[tarih]]++;
+        }
+      }
+    });
+    
+    // Grafiği çiz
+    var container = document.getElementById('weeklyChart');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    var maxSatis = Math.max.apply(null, gunlukSatis) || 1;
+    
+    for(var i=0; i<7; i++) {
+      var satis = gunlukSatis[i];
+      var yuzde = (satis / maxSatis) * 100;
+      var yukseklik = Math.max(20, yuzde * 1.2); // Min 20px
+      
+      var bugunMu = (i === bugunIndex - 1);
+      var renk = bugunMu ? 'linear-gradient(180deg,#43e97b,#38f9d7)' : 'linear-gradient(180deg,#667eea,#764ba2)';
+      
+      var div = document.createElement('div');
+      div.style.textAlign = 'center';
+      div.innerHTML = '<div style="font-size:10px;color:#4facfe;margin-bottom:3px">'+(satis>0?satis:'')+'</div><div style="width:40px;background:'+renk+';border-radius:5px 5px 0 0;height:'+yukseklik+'px;transition:height 0.3s"></div><div style="font-size:11px;color:'+(bugunMu?'#43e97b':'#888')+';margin-top:5px;font-weight:'+(bugunMu?'bold':'normal')+'">'+gunAdlari[i]+'</div>';
+      container.appendChild(div);
+    }
+  });
+}
+window.addEventListener('load', haftalikGrafigiBagla);
+</script>
 
 <!-- EN ÇOK SATAN ÜRÜNLER -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">
@@ -614,6 +675,35 @@ window.addEventListener('load', sayfaDurumlariniYukle);
 </div>
 </div>
 </div>
+<script>
+// Hedefler - Firebase'e bağlı
+function hedefleriBagla() {
+  if(typeof database === 'undefined') { setTimeout(hedefleriBagla, 500); return; }
+  
+  database.ref('istatistikler').on('value', function(snapshot) {
+    var istat = snapshot.val() || {};
+    var bugunSiparis = istat.bugunSiparis || 0;
+    var bugunCiro = istat.bugunCiro || 0;
+    
+    var siparisHedef = 10;
+    var ciroHedef = 10000;
+    
+    var siparisYuzde = Math.min(100, (bugunSiparis / siparisHedef) * 100);
+    var ciroYuzde = Math.min(100, (bugunCiro / ciroHedef) * 100);
+    
+    var goalProgress = document.getElementById('goalProgress');
+    var goalBar = document.getElementById('goalBar');
+    var revenueGoalProgress = document.getElementById('revenueGoalProgress');
+    var revenueGoalBar = document.getElementById('revenueGoalBar');
+    
+    if(goalProgress) goalProgress.textContent = bugunSiparis + ' / ' + siparisHedef + ' sipariş';
+    if(goalBar) goalBar.style.width = siparisYuzde + '%';
+    if(revenueGoalProgress) revenueGoalProgress.textContent = bugunCiro.toLocaleString('tr-TR') + '₺ / ' + ciroHedef.toLocaleString('tr-TR') + '₺';
+    if(revenueGoalBar) revenueGoalBar.style.width = ciroYuzde + '%';
+  });
+}
+window.addEventListener('load', hedefleriBagla);
+</script>
 
 <!-- PERFORMANS -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">
@@ -642,6 +732,13 @@ window.addEventListener('load', sayfaDurumlariniYukle);
 </div>
 </div>
 </div>
+<script>
+// Son güncelleme zamanı
+setInterval(function() {
+  var lastUpdateEl = document.getElementById('lastUpdate');
+  if(lastUpdateEl) lastUpdateEl.textContent = new Date().toLocaleTimeString('tr-TR');
+}, 1000);
+</script>
 
 <!-- 3D DÖNEN DÜNYA -->
 <!-- 3D DÜNYA -->
@@ -670,7 +767,8 @@ window.addEventListener('load', sayfaDurumlariniYukle);
 <!-- TÜM İSTATİSTİKLER - FIREBASE ENTEGRASYONU -->
 <script>
 (function(){
-  var bugun = new Date().toLocaleDateString('tr-TR');
+  var simdi = new Date();
+  var bugun = simdi.getDate().toString().padStart(2,'0') + '.' + (simdi.getMonth()+1).toString().padStart(2,'0') + '.' + simdi.getFullYear();
   
   // AYLIK SIFIRLAMA - Her ayın 1'inde çalışır
   function aylikSifirlama() {
@@ -710,6 +808,94 @@ window.addEventListener('load', sayfaDurumlariniYukle);
   }
   tarihGuncelle(); setInterval(tarihGuncelle, 1000);
   
+  // ========== ANLIK İSTATİSTİKLER (YENİ SİSTEM) ==========
+  // İlk yüklemede test verisi oluştur
+  database.ref('istatistikler').once('value', function(snapshot) {
+    if(!snapshot.exists()) {
+      console.log('📊 İstatistik tablosu oluşturuluyor...');
+      database.ref('istatistikler').set({
+        bugunTarih: bugun,
+        bugunSiparis: 0,
+        bugunCiro: 0,
+        bugunZiyaretci: 0,
+        toplamSiparis: 0,
+        toplamCiro: 0,
+        toplamZiyaretci: 0
+      });
+    }
+  });
+  
+  database.ref('istatistikler').on('value', function(snapshot) {
+    var istat = snapshot.val() || {};
+    console.log('📊 Firebase istatistikler:', istat);
+    
+    var kayitliTarih = istat.bugunTarih || '';
+    
+    // Eğer kayıtlı tarih bugün değilse, bugünkü değerler 0
+    var bugunSiparis = 0, bugunCiro = 0, bugunZiyaretci = 0;
+    if(kayitliTarih === bugun) {
+      bugunSiparis = istat.bugunSiparis || 0;
+      bugunCiro = istat.bugunCiro || 0;
+      bugunZiyaretci = istat.bugunZiyaretci || 0;
+    }
+    
+    var toplamSiparis = istat.toplamSiparis || 0;
+    var toplamCiro = istat.toplamCiro || 0;
+    var toplamZiyaretci = istat.toplamZiyaretci || 0;
+    
+    // Kartları güncelle
+    var todayOrdersEl = document.getElementById('todayOrders');
+    var totalOrdersEl = document.getElementById('totalOrders');
+    var todayRevenueEl = document.getElementById('todayRevenue');
+    var totalRevenueEl = document.getElementById('totalRevenue');
+    var todayVisitorsEl = document.getElementById('todayVisitors');
+    var totalVisitorsEl = document.getElementById('totalVisitors');
+    
+    if(todayOrdersEl) todayOrdersEl.textContent = bugunSiparis;
+    if(totalOrdersEl) totalOrdersEl.textContent = toplamSiparis;
+    if(todayRevenueEl) todayRevenueEl.textContent = bugunCiro.toLocaleString('tr-TR') + '₺';
+    if(totalRevenueEl) totalRevenueEl.textContent = toplamCiro.toLocaleString('tr-TR') + '₺';
+    if(todayVisitorsEl) todayVisitorsEl.textContent = bugunZiyaretci;
+    if(totalVisitorsEl) totalVisitorsEl.textContent = Math.max(toplamZiyaretci, bugunZiyaretci);
+    
+    // Dönüşüm oranı
+    var donusumOrani = bugunZiyaretci > 0 ? ((bugunSiparis / bugunZiyaretci) * 100).toFixed(1) : 0;
+    var conversionEl = document.getElementById('conversionRate');
+    if(conversionEl) conversionEl.textContent = donusumOrani + '%';
+    
+    // Ortalama sipariş
+    var ortSiparis = toplamSiparis > 0 ? Math.round(toplamCiro / toplamSiparis) : 0;
+    var avgOrderEl = document.getElementById('avgOrder');
+    if(avgOrderEl) avgOrderEl.textContent = ortSiparis.toLocaleString('tr-TR') + '₺';
+    
+    // ========== SAYFA İSTATİSTİKLERİ (istatistikler tablosundan) ==========
+    var urunZiyaretleri = [];
+    for(var i=1; i<=10; i++) {
+      urunZiyaretleri.push(istat['urun'+i+'Ziyaret'] || 0);
+    }
+    var maxUrunZiyaret = Math.max.apply(null, urunZiyaretleri) || 1;
+    var pageStatsHtml = '';
+    for(var i=1; i<=10; i++) {
+      var ziyaret = urunZiyaretleri[i-1];
+      var yuzde = Math.round((ziyaret/maxUrunZiyaret)*100);
+      pageStatsHtml += '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Ürün '+i+'</span><span style="color:#4facfe">'+ziyaret+' ziyaret</span></div><div style="background:#333;border-radius:5px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,#667eea,#764ba2);height:100%;width:'+yuzde+'%"></div></div></div>';
+    }
+    var pageStatsEl = document.getElementById('pageStats'); if(pageStatsEl) pageStatsEl.innerHTML = pageStatsHtml;
+    // =====================================================================
+    
+    // WhatsApp tıklama sayısı
+    var whatsappTiklama = istat.whatsappTiklama || 0;
+    var whatsappClicksEl = document.getElementById('whatsappClicks');
+    if(whatsappClicksEl) whatsappClicksEl.textContent = whatsappTiklama;
+    
+    // Tahmini kar (%30)
+    var estimatedProfitEl = document.getElementById('estimatedProfit');
+    if(estimatedProfitEl) estimatedProfitEl.textContent = Math.round(toplamCiro * 0.3).toLocaleString('tr-TR') + '₺';
+    
+    console.log('✅ Kartlar güncellendi:', {bugunSiparis, bugunCiro, bugunZiyaretci, toplamSiparis, toplamCiro});
+  });
+  // ======================================================
+  
   // Canlı ziyaretçileri dinle
   database.ref('canliZiyaretciler').on('value', function(snapshot) {
     var now = Date.now(), birDakikaOnce = now - 60000, aktifSayi = 0;
@@ -734,17 +920,27 @@ window.addEventListener('load', sayfaDurumlariniYukle);
   
   // ZİYARETÇİ İSTATİSTİKLERİ
   database.ref('ziyaretciler').on('value', function(snapshot) {
-    var bugunZiyaretci = 0, benzersizVisitorIds = {}, sayfaZiyaretleri = {}, sehirler = {};
+    var simdiZ = new Date();
+    var bugunZ = simdiZ.getDate().toString().padStart(2,'0') + '.' + (simdiZ.getMonth()+1).toString().padStart(2,'0') + '.' + simdiZ.getFullYear();
+    var bugunZiyaretci = 0, toplamZiyaret = 0, benzersizVisitorIds = {}, sayfaZiyaretleri = {}, sehirler = {};
     var cihazlar = {mobil:0, tablet:0, laptop:0, masaustu:0};
     var trafikler = {google:0, instagram:0, tiktok:0, facebook:0, direkt:0, diger:0};
     for(var i=1; i<=10; i++) sayfaZiyaretleri[i] = 0;
     
     snapshot.forEach(function(child) {
       var data = child.val();
-      if(data && data.visitorId) benzersizVisitorIds[data.visitorId] = true;
-      if(data && data.tarih === bugun) {
+      if(!data) return;
+      
+      toplamZiyaret++;
+      if(data.visitorId) benzersizVisitorIds[data.visitorId] = true;
+      
+      // Sayfa ziyaretlerini her zaman say (toplam)
+      if(data.sayfa) sayfaZiyaretleri[data.sayfa] = (sayfaZiyaretleri[data.sayfa] || 0) + 1;
+      
+      // Bugünkü ziyaretçiler - tarih karşılaştırması
+      var ziyaretTarih = data.tarih || '';
+      if(ziyaretTarih === bugunZ) {
         bugunZiyaretci++;
-        if(data.sayfa) sayfaZiyaretleri[data.sayfa] = (sayfaZiyaretleri[data.sayfa] || 0) + 1;
         if(data.sehir && data.sehir !== '') sehirler[data.sehir] = (sehirler[data.sehir] || 0) + 1;
         if(data.cihaz) cihazlar[data.cihaz] = (cihazlar[data.cihaz] || 0) + 1;
         if(data.trafikKaynagi) trafikler[data.trafikKaynagi] = (trafikler[data.trafikKaynagi] || 0) + 1;
@@ -752,18 +948,10 @@ window.addEventListener('load', sayfaDurumlariniYukle);
     });
     
     document.getElementById('todayVisitors').textContent = bugunZiyaretci;
-    document.getElementById('totalVisitors').textContent = Object.keys(benzersizVisitorIds).length;
+    // Toplam = en az bugünkü kadar olmalı
+    var toplamGosterilecek = Math.max(toplamZiyaret, Object.keys(benzersizVisitorIds).length, bugunZiyaretci);
+    document.getElementById('totalVisitors').textContent = toplamGosterilecek;
     var turkeyEl = document.getElementById('turkeyVisitors'); if(turkeyEl) turkeyEl.textContent = bugunZiyaretci;
-    
-    // Sayfa istatistikleri
-    var pageStatsHtml = '';
-    for(var i=1; i<=10; i++) {
-      var ziyaret = sayfaZiyaretleri[i] || 0;
-      var maxZiyaret = Math.max.apply(null, Object.values(sayfaZiyaretleri)) || 1;
-      var yuzde = Math.round((ziyaret/maxZiyaret)*100);
-      pageStatsHtml += '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Ürün '+i+'</span><span style="color:#4facfe">'+ziyaret+' ziyaret</span></div><div style="background:#333;border-radius:5px;height:8px;overflow:hidden"><div style="background:linear-gradient(90deg,#667eea,#764ba2);height:100%;width:'+yuzde+'%"></div></div></div>';
-    }
-    var pageStatsEl = document.getElementById('pageStats'); if(pageStatsEl) pageStatsEl.innerHTML = pageStatsHtml;
     
     // Şehirler
     var sehirArr = Object.entries(sehirler).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
@@ -799,6 +987,7 @@ window.addEventListener('load', sayfaDurumlariniYukle);
     var tB = document.getElementById('tiktokBar'); if(tB) tB.style.width = tiktokP + '%';
     var dB = document.getElementById('directBar'); if(dB) dB.style.width = direktP + '%';
     
+    window.bugunZiyaretciSayisi = bugunZiyaretci;
     hesaplaDonusumOrani(bugunZiyaretci);
   });
   
@@ -810,21 +999,63 @@ window.addEventListener('load', sayfaDurumlariniYukle);
     var urunSatislari = {}, haftalikSatislar = [0,0,0,0,0,0,0], sonSiparisler = [];
     for(var i=1; i<=10; i++) urunSatislari[i] = 0;
     
+    // Son 7 günün tarihlerini aynı formatta oluştur
     var son7Gun = [];
-    for(var d=6; d>=0; d--) { var tarih = new Date(); tarih.setDate(tarih.getDate() - d); son7Gun.push(tarih.toLocaleDateString('tr-TR')); }
+    for(var d=6; d>=0; d--) { 
+      var t = new Date(); 
+      t.setDate(t.getDate() - d); 
+      var gunStr = t.getDate().toString().padStart(2,'0') + '.' + (t.getMonth()+1).toString().padStart(2,'0') + '.' + t.getFullYear();
+      son7Gun.push(gunStr); 
+    }
     
     snapshot.forEach(function(child) {
-      var data = child.val(); toplamSiparis++;
-      var tutar = parseInt((data.tutar || '0').replace(/[^0-9]/g, '')) || 0;
+      var data = child.val(); 
+      if(!data) return;
+      
+      toplamSiparis++;
+      
+      // Tutarı sayıya çevir (299₺ -> 299)
+      var tutarStr = (data.tutar || '0').toString();
+      var tutar = parseInt(tutarStr.replace(/[^0-9]/g, '')) || 0;
       toplamCiro += tutar;
+      
+      // Durum kontrolü
       var durum = (data.durum || 'beklemede').toLowerCase();
-      if(durum === 'tamamlandi' || durum === 'tamamlandı') tamamlanan++; else if(durum === 'iptal') iptal++; else bekleyen++;
-      var kargoDurum = (data.kargoDurum || 'hazirlaniyor').toLowerCase();
-      if(kargoDurum === 'yolda') kargoYolda++; else if(kargoDurum === 'teslim') kargoTeslim++; else if(kargoDurum === 'iade') kargoIade++; else kargoHazirlaniyor++;
-      var forum = data.forum || 1; urunSatislari[forum] = (urunSatislari[forum] || 0) + 1;
-      if(data && data.tarih === bugun) { bugunSiparis++; bugunCiro += tutar; }
-      var siparisIdx = son7Gun.indexOf(data.tarih); if(siparisIdx > -1) haftalikSatislar[siparisIdx]++;
-      sonSiparisler.push({ tarih: data.tarih || '-', musteri: data.musteri || 'Müşteri', urun: data.urunAdi || ('Ürün ' + forum), tutar: data.tutar || '0₺', durum: durum, timestamp: data.timestamp || 0 });
+      if(durum === 'tamamlandi' || durum === 'tamamlandı' || durum === 'teslim edildi') tamamlanan++; 
+      else if(durum === 'iptal' || durum === 'iade') iptal++; 
+      else bekleyen++;
+      
+      // Kargo durumu
+      var kargoDurum = (data.kargoDurum || data.durum || 'hazirlaniyor').toLowerCase();
+      if(kargoDurum.includes('yolda') || kargoDurum.includes('kargoya verildi')) kargoYolda++; 
+      else if(kargoDurum.includes('teslim')) kargoTeslim++; 
+      else if(kargoDurum.includes('iade')) kargoIade++; 
+      else kargoHazirlaniyor++;
+      
+      // Ürün satışları
+      var forum = parseInt(data.forum) || 1; 
+      urunSatislari[forum] = (urunSatislari[forum] || 0) + 1;
+      
+      // Bugünkü siparişler - tarih karşılaştırması
+      var siparisTarih = data.tarih || '';
+      if(siparisTarih === bugun) { 
+        bugunSiparis++; 
+        bugunCiro += tutar; 
+      }
+      
+      // Haftalık satışlar
+      var siparisIdx = son7Gun.indexOf(siparisTarih); 
+      if(siparisIdx > -1) haftalikSatislar[siparisIdx]++;
+      
+      // Son siparişler listesi
+      sonSiparisler.push({ 
+        tarih: siparisTarih || '-', 
+        musteri: data.musteri || 'Müşteri', 
+        urun: data.urunAdi || ('Ürün ' + forum), 
+        tutar: data.tutar || '0₺', 
+        durum: durum, 
+        timestamp: data.timestamp || 0 
+      });
     });
     
     document.getElementById('todayOrders').textContent = bugunSiparis;
@@ -873,14 +1104,18 @@ window.addEventListener('load', sayfaDurumlariniYukle);
     
     window.bugunSiparisSayisi = bugunSiparis;
     document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('tr-TR');
+    
+    // Dönüşüm oranını güncelle
+    if(window.bugunZiyaretciSayisi) {
+      hesaplaDonusumOrani(window.bugunZiyaretciSayisi);
+    }
   });
   
-  // TIKLAMA ANALİZİ
+  // TIKLAMA ANALİZİ - Sipariş butonu (WhatsApp artık istatistikler tablosundan geliyor)
   database.ref('tiklamalar').on('value', function(snapshot) {
-    var siparisBtn = 0, whatsappBtn = 0;
-    snapshot.forEach(function(child) { var data = child.val(); if(data && data.tarih === bugun) { if(data.tip === 'siparis_btn') siparisBtn++; if(data.tip === 'whatsapp') whatsappBtn++; } });
+    var siparisBtn = 0;
+    snapshot.forEach(function(child) { var data = child.val(); if(data && data.tarih === bugun) { if(data.tip === 'siparis_btn') siparisBtn++; } });
     document.getElementById('orderBtnClicks').textContent = siparisBtn;
-    document.getElementById('whatsappClicks').textContent = whatsappBtn;
   });
   
   // SON AKTİVİTELER
@@ -927,6 +1162,9 @@ window.addEventListener('load', sayfaDurumlariniYukle);
   function hexToRgb(hex) { if(hex === 'gold') return '255,215,0'; if(hex === 'silver') return '192,192,192'; var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? parseInt(result[1],16)+','+parseInt(result[2],16)+','+parseInt(result[3],16) : '255,255,255'; }
   window.sesAcik = true;
   window.toggleSound = function() { window.sesAcik = !window.sesAcik; document.getElementById('soundBtn').textContent = window.sesAcik ? '🔊 Ses Açık' : '🔇 Ses Kapalı'; };
+  
+  // ==================== CANLI ZİYARETÇİ TAKİBİ KAPALI (Admin paneli) ====================
+  // Ana sayfa admin paneli olduğu için ziyaretçi olarak sayılmıyor
 })();
 </script>
 
@@ -1167,6 +1405,73 @@ window.addEventListener('load', function() {
 <div id="calendarDays" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px">
 </div>
 </div>
+<script>
+// Aylık Satış Takvimi - Firebase'e bağlı
+function aylikTakvimiBagla() {
+  if(typeof database === 'undefined') { setTimeout(aylikTakvimiBagla, 500); return; }
+  
+  var simdi = new Date();
+  var yil = simdi.getFullYear();
+  var ay = simdi.getMonth();
+  var bugun = simdi.getDate();
+  
+  // Ayın ilk günü hangi gün
+  var ilkGun = new Date(yil, ay, 1).getDay();
+  if(ilkGun === 0) ilkGun = 7; // Pazar'ı 7 yap
+  ilkGun--; // 0-indexed yap (Pazartesi=0)
+  
+  // Ayın kaç gün
+  var ayinGunSayisi = new Date(yil, ay + 1, 0).getDate();
+  
+  database.ref('siparisler').once('value', function(snapshot) {
+    var gunlukSatis = {};
+    
+    snapshot.forEach(function(child) {
+      var siparis = child.val();
+      if(siparis && siparis.tarih) {
+        var parcalar = siparis.tarih.split('.');
+        if(parcalar.length === 3) {
+          var sGun = parseInt(parcalar[0]);
+          var sAy = parseInt(parcalar[1]) - 1;
+          var sYil = parseInt(parcalar[2]);
+          if(sAy === ay && sYil === yil) {
+            gunlukSatis[sGun] = (gunlukSatis[sGun] || 0) + 1;
+          }
+        }
+      }
+    });
+    
+    var container = document.getElementById('calendarDays');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    // Boş günler (ayın başı)
+    for(var i=0; i<ilkGun; i++) {
+      var bos = document.createElement('div');
+      bos.style.cssText = 'padding:8px;';
+      container.appendChild(bos);
+    }
+    
+    // Ayın günleri
+    for(var gun=1; gun<=ayinGunSayisi; gun++) {
+      var div = document.createElement('div');
+      var satis = gunlukSatis[gun] || 0;
+      var bugunMu = (gun === bugun);
+      
+      var bgColor = 'rgba(255,255,255,0.05)';
+      if(satis > 0) bgColor = 'rgba(67,233,123,0.3)';
+      if(satis >= 5) bgColor = 'rgba(67,233,123,0.5)';
+      if(satis >= 10) bgColor = 'rgba(67,233,123,0.7)';
+      if(bugunMu) bgColor = 'rgba(79,172,254,0.4)';
+      
+      div.style.cssText = 'padding:8px;background:'+bgColor+';border-radius:5px;font-size:12px;position:relative;'+(bugunMu?'border:2px solid #4facfe;':'');
+      div.innerHTML = '<div style="font-weight:bold">'+gun+'</div>'+(satis>0?'<div style="font-size:9px;color:#43e97b">'+satis+'</div>':'');
+      container.appendChild(div);
+    }
+  });
+}
+window.addEventListener('load', aylikTakvimiBagla);
+</script>
 
 <!-- MÜŞTERİ YORUMLARI -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">
@@ -1249,23 +1554,48 @@ window.addEventListener('load', function() {
 <span>📱</span> SOSYAL MEDYA
 </div>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px">
-<div style="text-align:center;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);padding:20px;border-radius:10px">
+<div style="text-align:center;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);padding:20px;border-radius:10px;cursor:pointer" onclick="sosyalMedyaDuzenle('instagram')">
 <div style="font-size:30px">📸</div>
 <div style="font-size:20px;font-weight:bold" id="instaFollowers">0</div>
 <div style="font-size:11px;opacity:0.8">Takipçi</div>
 </div>
-<div style="text-align:center;background:#000;padding:20px;border-radius:10px;border:1px solid #333">
+<div style="text-align:center;background:#000;padding:20px;border-radius:10px;border:1px solid #333;cursor:pointer" onclick="sosyalMedyaDuzenle('tiktok')">
 <div style="font-size:30px">🎵</div>
 <div style="font-size:20px;font-weight:bold" id="tiktokFollowers">0</div>
 <div style="font-size:11px;opacity:0.8">Takipçi</div>
 </div>
-<div style="text-align:center;background:#25D366;padding:20px;border-radius:10px">
+<div style="text-align:center;background:#25D366;padding:20px;border-radius:10px;cursor:pointer" onclick="sosyalMedyaDuzenle('whatsapp')">
 <div style="font-size:30px">💬</div>
 <div style="font-size:20px;font-weight:bold" id="whatsappMsgs">0</div>
 <div style="font-size:11px;opacity:0.8">Mesaj</div>
 </div>
 </div>
 </div>
+<script>
+// Sosyal Medya - Firebase'e bağlı
+function sosyalMedyaBagla() {
+  if(typeof database === 'undefined') { setTimeout(sosyalMedyaBagla, 500); return; }
+  
+  database.ref('sosyalMedya').on('value', function(snapshot) {
+    var data = snapshot.val() || {};
+    var instaEl = document.getElementById('instaFollowers');
+    var tiktokEl = document.getElementById('tiktokFollowers');
+    var whatsappEl = document.getElementById('whatsappMsgs');
+    
+    if(instaEl) instaEl.textContent = (data.instagram || 0).toLocaleString('tr-TR');
+    if(tiktokEl) tiktokEl.textContent = (data.tiktok || 0).toLocaleString('tr-TR');
+    if(whatsappEl) whatsappEl.textContent = (data.whatsapp || 0).toLocaleString('tr-TR');
+  });
+}
+function sosyalMedyaDuzenle(platform) {
+  var mevcutDeger = document.getElementById(platform === 'instagram' ? 'instaFollowers' : (platform === 'tiktok' ? 'tiktokFollowers' : 'whatsappMsgs')).textContent;
+  var yeniDeger = prompt(platform.toUpperCase() + ' sayısını girin:', mevcutDeger.replace(/\./g,''));
+  if(yeniDeger !== null && !isNaN(yeniDeger)) {
+    database.ref('sosyalMedya/' + platform).set(parseInt(yeniDeger));
+  }
+}
+window.addEventListener('load', sosyalMedyaBagla);
+</script>
 
 <!-- STOK DURUMU -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">
@@ -1273,66 +1603,116 @@ window.addEventListener('load', function() {
 <span>🏷️</span> STOK DURUMU
 </div>
 <div id="stockStatus" style="max-height:250px;overflow-y:auto">
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(40,167,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #28a745">
-<span>Ürün 1</span>
-<span style="color:#28a745;font-weight:bold">✓ Stokta</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,193,7,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #ffc107">
-<span>Ürün 2</span>
-<span style="color:#ffc107;font-weight:bold">⚠️ Az Kaldı</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(220,53,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #dc3545">
-<span>Ürün 3</span>
-<span style="color:#dc3545;font-weight:bold">❌ Tükendi</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(40,167,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #28a745">
-<span>Ürün 4</span>
-<span style="color:#28a745;font-weight:bold">✓ Stokta</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(40,167,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #28a745">
-<span>Ürün 5</span>
-<span style="color:#28a745;font-weight:bold">✓ Stokta</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,193,7,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #ffc107">
-<span>Ürün 6</span>
-<span style="color:#ffc107;font-weight:bold">⚠️ Az Kaldı</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(40,167,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #28a745">
-<span>Ürün 7</span>
-<span style="color:#28a745;font-weight:bold">✓ Stokta</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(220,53,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #dc3545">
-<span>Ürün 8</span>
-<span style="color:#dc3545;font-weight:bold">❌ Tükendi</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(40,167,69,0.1);border-radius:8px;margin-bottom:8px;border-left:4px solid #28a745">
-<span>Ürün 9</span>
-<span style="color:#28a745;font-weight:bold">✓ Stokta</span>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(255,193,7,0.1);border-radius:8px;border-left:4px solid #ffc107">
-<span>Ürün 10</span>
-<span style="color:#ffc107;font-weight:bold">⚠️ Az Kaldı</span>
 </div>
 </div>
-</div>
+<script>
+// Stok Durumu - Firebase'e bağlı
+function stokDurumunuBagla() {
+  if(typeof database === 'undefined') { setTimeout(stokDurumunuBagla, 500); return; }
+  
+  database.ref('forumStoklar').on('value', function(snapshot) {
+    var stoklar = snapshot.val() || {};
+    var container = document.getElementById('stockStatus');
+    if(!container) return;
+    
+    var html = '';
+    for(var i=1; i<=10; i++) {
+      var stok = stoklar['forum'+i] || 0;
+      var durum, renk, ikon;
+      
+      if(stok <= 0) {
+        durum = 'Tükendi'; renk = '#dc3545'; ikon = '❌';
+      } else if(stok <= 5) {
+        durum = 'Az Kaldı ('+stok+')'; renk = '#ffc107'; ikon = '⚠️';
+      } else {
+        durum = 'Stokta ('+stok+')'; renk = '#28a745'; ikon = '✓';
+      }
+      
+      var bgOpacity = stok <= 0 ? '0.15' : (stok <= 5 ? '0.1' : '0.1');
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba('+hexToRgb(renk)+','+bgOpacity+');border-radius:8px;margin-bottom:8px;border-left:4px solid '+renk+'"><span>Ürün '+i+'</span><span style="color:'+renk+';font-weight:bold">'+ikon+' '+durum+'</span></div>';
+    }
+    container.innerHTML = html;
+  });
+}
+function hexToRgb(hex) {
+  if(hex.charAt(0) === '#') hex = hex.substr(1);
+  if(hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+  return r+','+g+','+b;
+}
+window.addEventListener('load', stokDurumunuBagla);
+</script>
 
 <!-- EN YOĞUN SAATLER -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">
 <div style="font-size:18px;font-weight:bold;margin-bottom:20px;display:flex;align-items:center;gap:10px">
 <span>⏰</span> EN YOĞUN SAATLER
 </div>
-<div style="display:flex;align-items:flex-end;justify-content:space-between;height:100px;padding:10px 0">
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.3);height:20px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">00</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.2);height:10px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">03</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.2);height:15px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">06</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.4);height:35px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">09</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.6);height:55px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">12</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(79,172,254,0.5);height:45px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">15</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(250,112,154,0.8);height:80px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">18</div></div>
-<div style="text-align:center;flex:1"><div style="background:rgba(250,112,154,1);height:100px;border-radius:3px 3px 0 0"></div><div style="font-size:9px;color:#888;margin-top:3px">21</div></div>
+<div id="hourlyChart" style="display:flex;align-items:flex-end;justify-content:space-between;height:100px;padding:10px 0">
 </div>
-<div style="text-align:center;margin-top:10px;color:#fa709a;font-size:13px">🔥 En yoğun saat: <strong>21:00</strong></div>
+<div id="peakHourText" style="text-align:center;margin-top:10px;color:#fa709a;font-size:13px">🔥 En yoğun saat: <strong>--:00</strong></div>
 </div>
+<script>
+// En Yoğun Saatler - Firebase'e bağlı
+function saatlikGrafigiBagla() {
+  if(typeof database === 'undefined') { setTimeout(saatlikGrafigiBagla, 500); return; }
+  
+  var saatler = [0,3,6,9,12,15,18,21]; // 3 saatlik dilimler
+  var saatlikAktivite = {};
+  saatler.forEach(function(s){ saatlikAktivite[s] = 0; });
+  
+  // Ziyaretçilerden saat bilgisi al
+  database.ref('ziyaretciler').once('value', function(snapshot) {
+    snapshot.forEach(function(child) {
+      var data = child.val();
+      if(data && data.timestamp) {
+        var saat = new Date(data.timestamp).getHours();
+        var dilim = Math.floor(saat / 3) * 3; // 0,3,6,9,12,15,18,21
+        saatlikAktivite[dilim] = (saatlikAktivite[dilim] || 0) + 1;
+      }
+    });
+    
+    // Siparişlerden de ekle
+    database.ref('siparisler').once('value', function(sipSnap) {
+      sipSnap.forEach(function(child) {
+        var data = child.val();
+        if(data && data.timestamp) {
+          var saat = new Date(data.timestamp).getHours();
+          var dilim = Math.floor(saat / 3) * 3;
+          saatlikAktivite[dilim] = (saatlikAktivite[dilim] || 0) + 2; // Sipariş 2 puan
+        }
+      });
+      
+      // Grafiği çiz
+      var container = document.getElementById('hourlyChart');
+      if(!container) return;
+      container.innerHTML = '';
+      
+      var maxAktivite = Math.max.apply(null, Object.values(saatlikAktivite)) || 1;
+      var enYogunSaat = 0, enYogunDeger = 0;
+      
+      saatler.forEach(function(saat) {
+        var aktivite = saatlikAktivite[saat] || 0;
+        if(aktivite > enYogunDeger) { enYogunDeger = aktivite; enYogunSaat = saat; }
+        
+        var yuzde = (aktivite / maxAktivite) * 100;
+        var yukseklik = Math.max(10, yuzde);
+        var enYogunMu = (aktivite === maxAktivite && aktivite > 0);
+        var renk = enYogunMu ? 'rgba(250,112,154,1)' : 'rgba(79,172,254,0.5)';
+        
+        var div = document.createElement('div');
+        div.style.cssText = 'text-align:center;flex:1';
+        div.innerHTML = '<div style="background:'+renk+';height:'+yukseklik+'px;border-radius:3px 3px 0 0;margin:0 2px"></div><div style="font-size:9px;color:#888;margin-top:3px">'+saat.toString().padStart(2,'0')+'</div>';
+        container.appendChild(div);
+      });
+      
+      var peakText = document.getElementById('peakHourText');
+      if(peakText) peakText.innerHTML = '🔥 En yoğun saat: <strong>'+enYogunSaat.toString().padStart(2,'0')+':00</strong>';
+    });
+  });
+}
+window.addEventListener('load', saatlikGrafigiBagla);
+</script>
 
 <!-- ÜRÜN SAYFALARI YÖNETİMİ -->
 <div style="margin-top:25px;background:rgba(0,0,0,0.4);border:1px solid #333;border-radius:15px;padding:20px">

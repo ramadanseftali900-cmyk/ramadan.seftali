@@ -391,35 +391,17 @@
 <!-- DNS SECTION -->
 <div id="dns" class="section active">
     <div class="section-header">
-        <h2>� DNS AYARLARI</h2>
+        <h2>🌐 DNS AYARLARI</h2>
         <p>Domain'inizi Vercel'e yönlendirin</p>
     </div>
     
     <div class="container">
         <div class="info-box">
             <div class="info-box-icon">ℹ️</div>
-            <div>Bu bölümde domain'inizin DNS ayarlarını yapacaksınız. API bilgileriniz varsa otomatik, yoksa manuel talimat alabilirsiniz.</div>
+            <div>Domain aldığınız siteye gidin (Namecheap, GoDaddy vs.), DNS ayarlarına aşağıdaki değerleri ekleyin.</div>
         </div>
         
         <div class="form-grid">
-            <div class="form-group">
-                <label>Domain Adı</label>
-                <div style="display:flex;gap:10px;align-items:center">
-                    <input type="text" id="domainAdi" placeholder="örn: sitenadi.com" onchange="domainGuncelle()" style="flex:1">
-                    <button onclick="domainKaydet(this)" style="background:#28a745;color:#fff;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap">💾 Kaydet</button>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>DNS Sağlayıcı</label>
-                <div style="display:flex;gap:10px;align-items:center">
-                    <input type="text" id="dnsSaglayici" placeholder="Cloudflare, Namecheap, GoDaddy..." style="flex:1">
-                    <button onclick="dnsKaydet(this)" style="background:#28a745;color:#fff;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap">💾 Kaydet</button>
-                </div>
-            </div>
-            
-            <div class="form-divider"></div>
-            
             <!-- DNS KAYITLARI TABLOSU -->
             <div class="form-group full-width">
                 <label>📋 DNS KAYITLARI - Sırayla Kopyala & Yapıştır</label>
@@ -482,18 +464,9 @@
             </div>
         </div>
         
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="apiTest()">🔍 API Test Et</button>
-            <button class="btn btn-primary" onclick="dnsKayitlariOlustur()">🚀 DNS Oluştur</button>
-            <button class="btn btn-secondary" onclick="dnsKayitlariKontrol()">🔍 Kontrol Et</button>
-            <button class="btn btn-secondary" onclick="manuelTalimatGoster()">📋 Manuel Talimat</button>
-        </div>
-        
         <div style="margin-top: 20px; text-align: center;">
             <a href="https://ap.www.namecheap.com/domains/list/" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">🌐 Namecheap DNS Paneli</a>
         </div>
-        
-        <div id="dnsResult" class="result-box" style="display: none;"></div>
     </div>
 </div>
 
@@ -505,106 +478,65 @@
     </div>
     
     <div class="container">
-        <div class="info-box">
-            <div class="info-box-icon">ℹ️</div>
-            <div>Vercel, GitHub'dan otomatik deploy yapar. Kodlarınızı GitHub'a yükleyip repo linkini buraya girin.</div>
-        </div>
-        
-        <div class="form-grid">
-            <div class="form-group">
-                <label>GitHub Kullanıcı Adı</label>
-                <input type="text" id="githubUser" placeholder="kullaniciadi">
-            </div>
-            
-            <div class="form-group">
-                <label>Repo Adı</label>
-                <input type="text" id="repoName" placeholder="proje-adi">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group full-width">
-                <label>GitHub Repo URL</label>
-                <input type="text" id="githubUrl" placeholder="https://github.com/kullaniciadi/proje-adi">
+        <div class="step-group">
+            <div class="step-group-title">📋 YAPILACAKLAR</div>
+            <div class="step-group-content">
+                <div class="step-item">
+                    <div class="step-text">1️⃣ GitHub'a giriş yap</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">2️⃣ "New repository" tıkla, repo adı gir</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">3️⃣ "Public" seç, "Create repository" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">4️⃣ "uploading an existing file" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">5️⃣ Tüm dosyaları sürükle bırak, "Commit changes" tıkla</div>
+                </div>
             </div>
         </div>
         
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="githubRepoKontrol()">🔍 Repo Kontrol</button>
-            <button class="btn btn-secondary" onclick="githubTalimatGoster()">📋 GitHub Talimatı</button>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="https://github.com/new" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #333 0%, #24292e 100%); color: #fff; padding: 15px 40px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">🐙 GitHub'a Git - Repo Oluştur</a>
         </div>
-        
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="https://github.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #333 0%, #24292e 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">🐙 GitHub'a Git</a>
-        </div>
-        
-        <div id="githubResult" class="result-box" style="display: none;"></div>
     </div>
 </div>
 
 <!-- VERCEL SECTION -->
 <div id="vercel" class="section">
     <div class="section-header">
-        <h2>🚀 VERCEL DEPLOY</h2>
+        <h2>� VERCEL DEPLOY</h2>
         <p>Projenizi canlıya alın</p>
     </div>
     
     <div class="container">
-        <div class="info-box">
-            <div class="info-box-icon">ℹ️</div>
-            <div>GitHub repo'nuzu Vercel'e bağlayıp otomatik deploy yapın. Vercel size ücretsiz hosting sağlar.</div>
-        </div>
-        
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Vercel Token (Opsiyonel)</label>
-                <input type="password" id="vercelToken" placeholder="Vercel API token">
-            </div>
-            
-            <div class="form-group">
-                <label>Proje Adı</label>
-                <input type="text" id="vercelProjectName" placeholder="proje-adi">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group">
-                <label>Framework</label>
-                <input type="text" id="vercelFramework" value="Other" placeholder="Other, Next.js, React...">
-            </div>
-            
-            <div class="form-group">
-                <label>Build Command</label>
-                <input type="text" id="vercelBuildCommand" placeholder="npm run build (opsiyonel)">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group full-width">
-                <label>Vercel Proje URL</label>
-                <input type="text" id="vercelUrl" placeholder="https://proje-adi.vercel.app">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group">
-                <label>Custom Domain</label>
-                <input type="text" id="vercelCustomDomain" placeholder="sitenadi.com">
+        <div class="step-group">
+            <div class="step-group-title">� YAPILACAKLAR</div>
+            <div class="step-group-content">
+                <div class="step-item">
+                    <div class="step-text">1️⃣ Vercel'e GitHub ile giriş yap</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">2️⃣ "Add New Project" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">3️⃣ GitHub repo'nu seç</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">4️⃣ "Deploy" tıkla, bekle</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">5️⃣ Settings > Domains > Domain ekle</div>
+                </div>
             </div>
         </div>
         
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="vercelDeploy()">🚀 Deploy Et</button>
-            <button class="btn btn-primary" onclick="vercelKontrol()">🔍 Proje Kontrol</button>
-            <button class="btn btn-secondary" onclick="vercelDomainBagla()">🔗 Domain Bağla</button>
-            <button class="btn btn-secondary" onclick="vercelTalimatGoster()">📋 Vercel Talimatı</button>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="https://vercel.com/new" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; padding: 15px 40px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">▲ Vercel'e Git - Deploy Et</a>
         </div>
-        
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="https://vercel.com/dashboard" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #000 0%, #333 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">▲ Vercel Dashboard</a>
-        </div>
-        
-        <div id="vercelResult" class="result-box" style="display: none;"></div>
     </div>
 </div>
 
@@ -612,63 +544,117 @@
 <div id="firebase" class="section">
     <div class="section-header">
         <h2>🔥 FIREBASE KURULUM</h2>
-        <p>Analytics ve diğer servisleri aktifleştirin</p>
+        <p>Sipariş verilerini kaydetmek için Firebase bağlayın</p>
     </div>
     
     <div class="container">
-        <div class="info-box">
-            <div class="info-box-icon">ℹ️</div>
-            <div>Firebase Analytics, Authentication ve diğer servisleri projenize entegre edin.</div>
-        </div>
-        
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Firebase Project ID</label>
-                <input type="text" id="firebaseProjectId" placeholder="proje-id">
-            </div>
-            
-            <div class="form-group">
-                <label>Firebase API Key</label>
-                <input type="password" id="firebaseApiKey" placeholder="Firebase API key">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group">
-                <label>Firebase App ID</label>
-                <input type="text" id="firebaseAppId" placeholder="1:123456789:web:abcdef">
-            </div>
-            
-            <div class="form-group">
-                <label>Measurement ID (Analytics)</label>
-                <input type="text" id="firebaseMeasurementId" placeholder="G-XXXXXXXXXX">
-            </div>
-            
-            <div class="form-divider"></div>
-            
-            <div class="form-group">
-                <label>Auth Domain</label>
-                <input type="text" id="firebaseAuthDomain" placeholder="proje-id.firebaseapp.com">
-            </div>
-            
-            <div class="form-group">
-                <label>Storage Bucket</label>
-                <input type="text" id="firebaseStorageBucket" placeholder="proje-id.appspot.com">
+        <!-- TALİMATLAR -->
+        <div class="step-group">
+            <div class="step-group-title">📋 ADIM ADIM TALİMAT - PROJE OLUŞTURMA</div>
+            <div class="step-group-content">
+                <div class="step-item">
+                    <div class="step-text">1️⃣ Aşağıdaki butona tıkla, Firebase Console açılacak</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">2️⃣ Google hesabınla giriş yap</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">3️⃣ "Create a project" (Proje oluştur) tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">4️⃣ Proje adı yaz (örn: benim-sitem), "Continue" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">5️⃣ Google Analytics'i aç, "Continue" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">6️⃣ "Default Account" seç, "Create project" tıkla, bekle</div>
+                </div>
             </div>
         </div>
         
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="firebaseKur()">🔥 Firebase Kur</button>
-            <button class="btn btn-primary" onclick="firebaseKontrol()">🔍 Config Kontrol</button>
-            <button class="btn btn-secondary" onclick="firebaseConfigOlustur()">⚙️ Config Oluştur</button>
-            <button class="btn btn-secondary" onclick="firebaseTalimatGoster()">📋 Firebase Talimatı</button>
+        <!-- REALTIME DATABASE KURULUMU -->
+        <div class="step-group" style="margin-top:20px;">
+            <div class="step-group-title">🗄️ REALTIME DATABASE KURULUMU (ÖNEMLİ!)</div>
+            <div class="step-group-content">
+                <div class="step-item">
+                    <div class="step-text">1️⃣ Sol menüde "Build" → "Realtime Database" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">2️⃣ "Create Database" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">3️⃣ Lokasyon seç (europe-west1 önerilir), "Next" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">4️⃣ "Start in test mode" seç, "Enable" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">5️⃣ Database URL'i kopyala (https://proje-adi-default-rtdb... şeklinde)</div>
+                </div>
+            </div>
         </div>
         
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="https://console.firebase.google.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #FFA000 0%, #F57C00 100%); color: #fff; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 14px;">🔥 Firebase Console</a>
+        <!-- WEB APP KAYIT -->
+        <div class="step-group" style="margin-top:20px;">
+            <div class="step-group-title">🌐 WEB APP KAYIT</div>
+            <div class="step-group-content">
+                <div class="step-item">
+                    <div class="step-text">1️⃣ Sol menüde ⚙️ (dişli) → "Project settings" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">2️⃣ Aşağı kaydır, "</>" (Web) ikonuna tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">3️⃣ App nickname yaz, "Register app" tıkla</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-text">4️⃣ Çıkan koddan <strong>apiKey</strong> ve <strong>projectId</strong> değerlerini aşağıya yaz</div>
+                </div>
+            </div>
         </div>
         
-        <div id="firebaseResult" class="result-box" style="display: none;"></div>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="https://console.firebase.google.com" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #FFA000 0%, #F57C00 100%); color: #fff; padding: 15px 40px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 16px;">🔥 Firebase Console'a Git</a>
+        </div>
+        
+        <!-- Firebase Config Girişi -->
+        <div class="step-group" style="margin-top:30px;">
+            <div class="step-group-title">⚙️ FİREBASE BİLGİLERİNİ GİR</div>
+            <div class="step-group-content" style="padding:25px;">
+                <div class="form-group" style="margin-bottom:20px;">
+                    <label style="color:#FFA000;font-weight:bold;">API Key (apiKey değeri)</label>
+                    <input type="text" id="fbApiKey" placeholder="AIzaSyB... şeklinde başlayan kod" style="width:100%;padding:12px;border-radius:8px;border:2px solid #FFA000;background:rgba(255,160,0,0.1);color:#fff;font-size:14px;">
+                </div>
+                <div class="form-group" style="margin-bottom:20px;">
+                    <label style="color:#FFA000;font-weight:bold;">Project ID (projectId değeri)</label>
+                    <input type="text" id="fbProjectId" placeholder="proje-adi-12345 şeklinde" style="width:100%;padding:12px;border-radius:8px;border:2px solid #FFA000;background:rgba(255,160,0,0.1);color:#fff;font-size:14px;">
+                </div>
+                <div class="form-group" style="margin-bottom:20px;">
+                    <label style="color:#FFA000;font-weight:bold;">Database URL (Realtime Database'den kopyaladığın URL)</label>
+                    <input type="text" id="fbDatabaseUrl" placeholder="https://proje-adi-default-rtdb.europe-west1.firebasedatabase.app" style="width:100%;padding:12px;border-radius:8px;border:2px solid #FFA000;background:rgba(255,160,0,0.1);color:#fff;font-size:14px;">
+                </div>
+                
+                <!-- Kaydet Butonu -->
+                <div style="text-align:center;margin-top:25px;">
+                    <button onclick="firebaseKaydet()" style="background:linear-gradient(135deg, #2ed573 0%, #17a2b8 100%);color:#fff;border:none;padding:18px 50px;border-radius:30px;cursor:pointer;font-size:18px;font-weight:bold;box-shadow:0 5px 20px rgba(46,213,115,0.4);">💾 KAYDET & TEST ET</button>
+                </div>
+                
+                <!-- Sonuç Göstergesi -->
+                <div id="firebaseResult" style="margin-top:20px;text-align:center;padding:15px;border-radius:10px;display:none;font-size:16px;font-weight:bold;"></div>
+            </div>
+        </div>
+        
+        <!-- Firebase Durumu -->
+        <div class="step-group" style="margin-top:20px;">
+            <div class="step-group-title">📊 FİREBASE DURUMU</div>
+            <div class="step-group-content" style="padding:20px;">
+                <div id="firebaseStatus" style="text-align:center;">
+                    <div style="font-size:48px;margin-bottom:10px;">⏳</div>
+                    <div style="font-size:18px;color:#888;">Firebase durumu kontrol ediliyor...</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -680,83 +666,56 @@
     </div>
     
     <div class="container">
-        <div class="status-card">
-            <h3>Kurulum Durumu</h3>
+        <div class="step-group">
+            <div class="step-group-title">📋 KONTROL LİSTESİ</div>
+            <div class="step-group-content">
+                <div class="step-item" id="step1">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">Domain satın alındı</div>
+                </div>
+                <div class="step-item" id="step2">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">DNS kayıtları eklendi</div>
+                </div>
+                <div class="step-item" id="step3">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">GitHub repo oluşturuldu</div>
+                </div>
+                <div class="step-item" id="step4">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">Vercel'e deploy edildi</div>
+                </div>
+                <div class="step-item" id="step5">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">Domain Vercel'e bağlandı</div>
+                </div>
+                <div class="step-item" id="step6">
+                    <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
+                    <div class="step-text">Site açılıyor</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-card" style="margin-top:20px;">
+            <p id="progressText">0 / 6 adım tamamlandı</p>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
             </div>
-            <p id="progressText">0 / 8 adım tamamlandı</p>
         </div>
         
-        <div class="step-list">
-            <div class="step-group">
-                <div class="step-group-title">Kurulum Durumu</div>
-                <div class="step-group-content">
-                    <div class="step-item" id="step1">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">Domain satın alındı</div>
-                    </div>
-                    
-                    <div class="step-item" id="step2">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">GitHub repo oluşturuldu</div>
-                    </div>
+        <!-- Site Adresi Girişi -->
+        <div class="step-group" style="margin-top:30px;">
+            <div class="step-group-title">🌐 SİTE ADRESİNİZ</div>
+            <div class="step-group-content" style="padding:20px;">
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <input type="text" id="siteAdresi" placeholder="örn: siteniz.com" style="flex:1;padding:15px;border-radius:10px;border:2px solid #2ed573;background:rgba(46,213,115,0.1);color:#fff;font-size:16px;">
+                    <button onclick="siteAdresiKaydet()" style="background:#2ed573;color:#fff;border:none;padding:15px 25px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:bold;">💾 Kaydet</button>
                 </div>
-            </div>
-
-            <div class="step-group">
-                <div class="step-group-title">Deploy İşlemleri</div>
-                <div class="step-group-content">
-                    <div class="step-item" id="step3">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">Vercel'e deploy edildi</div>
-                    </div>
-                    
-                    <div class="step-item" id="step4">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">DNS kayıtları oluşturuldu</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-group">
-                <div class="step-group-title">Domain Bağlantısı</div>
-                <div class="step-group-content">
-                    <div class="step-item" id="step5">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">Domain Vercel'e bağlandı</div>
-                    </div>
-                    
-                    <div class="step-item" id="step6">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">SSL sertifikası aktif</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-group">
-                <div class="step-group-title">Entegrasyon</div>
-                <div class="step-group-content">
-                    <div class="step-item" id="step7">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">Firebase entegre edildi</div>
-                    </div>
-                    
-                    <div class="step-item" id="step8">
-                        <input type="checkbox" class="step-checkbox" onchange="adimGuncelle()">
-                        <div class="step-text">Site tarayıcıdan açılıyor</div>
-                    </div>
+                <div style="margin-top:20px;text-align:center;">
+                    <button onclick="siteyiAc()" style="background:linear-gradient(135deg, #2ed573 0%, #17a2b8 100%);color:#fff;border:none;padding:18px 50px;border-radius:30px;cursor:pointer;font-size:18px;font-weight:bold;box-shadow:0 5px 20px rgba(46,213,115,0.4);">🌐 Siteyi Aç - Test Et</button>
                 </div>
             </div>
         </div>
-        
-        <div class="btn-group">
-            <button class="btn btn-primary" onclick="tumTestleriYap()">� Tüm Testleri Yap</button>
-            <button class="btn btn-secondary" onclick="kaydet()">💾 Kaydet</button>
-            <button class="btn btn-secondary" onclick="temizle()">🗑️ Temizle</button>
-        </div>
-        
-        <div id="testResult" class="result-box" style="display: none;"></div>
     </div>
 </div>
 
@@ -765,11 +724,11 @@
 window.onload = function() {
     yukle();
     adimGuncelle();
-    // Kaydedilen domain ve DNS'i yükle
-    var kayitliDomain = localStorage.getItem('domain_adi');
-    var kayitliDns = localStorage.getItem('dns_saglayici');
-    if(kayitliDomain) document.getElementById('domainAdi').value = kayitliDomain;
-    if(kayitliDns) document.getElementById('dnsSaglayici').value = kayitliDns;
+    // Firebase ayarlarını yükle
+    firebaseYukle();
+    // Site adresini yükle
+    var kayitliSite = localStorage.getItem('site_adresi');
+    if(kayitliSite) document.getElementById('siteAdresi').value = kayitliSite;
 };
 
 // KOPYALA FONKSİYONU
@@ -784,6 +743,162 @@ function kopyala(inputId, btn) {
             btn.style.background = '#28a745';
         }, 1500);
     });
+}
+
+// FIREBASE KAYDET
+function firebaseKaydet() {
+    var apiKey = document.getElementById('fbApiKey').value;
+    var projectId = document.getElementById('fbProjectId').value;
+    var databaseUrl = document.getElementById('fbDatabaseUrl').value;
+    
+    var resultDiv = document.getElementById('firebaseResult');
+    
+    if (!apiKey || !projectId) {
+        resultDiv.innerHTML = '❌ API Key ve Project ID gerekli!';
+        resultDiv.style.background = 'rgba(255,107,107,0.2)';
+        resultDiv.style.color = '#ff6b6b';
+        resultDiv.style.display = 'block';
+        return;
+    }
+    
+    // Database URL yoksa otomatik oluştur
+    if (!databaseUrl) {
+        databaseUrl = 'https://' + projectId + '-default-rtdb.firebaseio.com';
+        document.getElementById('fbDatabaseUrl').value = databaseUrl;
+    }
+    
+    // localStorage'a kaydet
+    var settings = JSON.parse(localStorage.getItem('account_settings') || '{}');
+    settings.firebaseApiKey = apiKey;
+    settings.firebaseProjectId = projectId;
+    settings.firebaseDatabaseUrl = databaseUrl;
+    localStorage.setItem('account_settings', JSON.stringify(settings));
+    
+    // Bağlantı testi yap
+    resultDiv.innerHTML = '🔄 Firebase bağlantısı test ediliyor...';
+    resultDiv.style.background = 'rgba(255,193,7,0.2)';
+    resultDiv.style.color = '#ffc107';
+    resultDiv.style.display = 'block';
+    
+    // Firebase'i yeniden başlat
+    try {
+        var testConfig = {
+            apiKey: apiKey,
+            authDomain: projectId + ".firebaseapp.com",
+            databaseURL: databaseUrl,
+            projectId: projectId,
+            storageBucket: projectId + ".appspot.com"
+        };
+        
+        // Mevcut Firebase'i kapat ve yeniden başlat
+        if (firebase.apps.length) {
+            firebase.app().delete().then(function() {
+                firebase.initializeApp(testConfig);
+                testFirebaseConnection(resultDiv);
+            });
+        } else {
+            firebase.initializeApp(testConfig);
+            testFirebaseConnection(resultDiv);
+        }
+    } catch(e) {
+        resultDiv.innerHTML = '❌ Hata: ' + e.message;
+        resultDiv.style.background = 'rgba(255,107,107,0.2)';
+        resultDiv.style.color = '#ff6b6b';
+    }
+}
+
+// Firebase bağlantı testi
+function testFirebaseConnection(resultDiv) {
+    var db = firebase.database();
+    
+    // Test verisi yaz
+    db.ref('test_baglanti').set({
+        zaman: new Date().toISOString(),
+        test: true
+    }).then(function() {
+        // Başarılı
+        resultDiv.innerHTML = '✅ BAŞARILI! Firebase bağlantısı çalışıyor. Ayarlar kaydedildi.';
+        resultDiv.style.background = 'rgba(46,213,115,0.2)';
+        resultDiv.style.color = '#2ed573';
+        
+        // Test verisini sil
+        db.ref('test_baglanti').remove();
+    }).catch(function(error) {
+        // Hata
+        var hataMesaji = '❌ Bağlantı hatası: ';
+        if (error.code === 'PERMISSION_DENIED') {
+            hataMesaji += 'Veritabanı kuralları izin vermiyor. Firebase Console\'da Realtime Database kurallarını kontrol edin.';
+        } else {
+            hataMesaji += error.message;
+        }
+        resultDiv.innerHTML = hataMesaji;
+        resultDiv.style.background = 'rgba(255,107,107,0.2)';
+        resultDiv.style.color = '#ff6b6b';
+    });
+}
+
+// Firebase ayarlarını yükle
+function firebaseYukle() {
+    var settings = JSON.parse(localStorage.getItem('account_settings') || '{}');
+    if (settings.firebaseApiKey) document.getElementById('fbApiKey').value = settings.firebaseApiKey;
+    if (settings.firebaseProjectId) document.getElementById('fbProjectId').value = settings.firebaseProjectId;
+    if (settings.firebaseDatabaseUrl) document.getElementById('fbDatabaseUrl').value = settings.firebaseDatabaseUrl;
+    
+    // Firebase durumunu göster
+    firebaseDurumGoster();
+}
+
+// Firebase durumunu göster
+function firebaseDurumGoster() {
+    var statusDiv = document.getElementById('firebaseStatus');
+    if (!statusDiv) return;
+    
+    var settings = JSON.parse(localStorage.getItem('account_settings') || '{}');
+    
+    if (settings.firebaseApiKey && settings.firebaseProjectId && settings.firebaseDatabaseUrl) {
+        statusDiv.innerHTML = `
+            <div style="font-size:48px;margin-bottom:10px;">✅</div>
+            <div style="font-size:18px;color:#2ed573;font-weight:bold;">Firebase Bağlı</div>
+            <div style="margin-top:15px;text-align:left;background:rgba(46,213,115,0.1);padding:15px;border-radius:10px;">
+                <div style="margin-bottom:8px;"><strong>Project ID:</strong> ${settings.firebaseProjectId}</div>
+                <div style="margin-bottom:8px;"><strong>Database:</strong> ${settings.firebaseDatabaseUrl}</div>
+                <div><strong>API Key:</strong> ${settings.firebaseApiKey.substring(0,15)}...</div>
+            </div>
+        `;
+    } else {
+        statusDiv.innerHTML = `
+            <div style="font-size:48px;margin-bottom:10px;">❌</div>
+            <div style="font-size:18px;color:#ff6b6b;font-weight:bold;">Firebase Bağlı Değil</div>
+            <div style="margin-top:10px;color:#888;">Yukarıdaki adımları takip edip bilgileri girin</div>
+        `;
+    }
+}
+
+// Site adresi kaydet
+function siteAdresiKaydet() {
+    var adres = document.getElementById('siteAdresi').value;
+    if(adres) {
+        // https:// yoksa ekle
+        if(!adres.startsWith('http://') && !adres.startsWith('https://')) {
+            adres = 'https://' + adres;
+        }
+        localStorage.setItem('site_adresi', adres);
+        alert('✅ Site adresi kaydedildi!');
+    }
+}
+
+// Siteyi aç
+function siteyiAc() {
+    var adres = document.getElementById('siteAdresi').value;
+    if(!adres) {
+        alert('❌ Önce site adresini girin!');
+        return;
+    }
+    // https:// yoksa ekle
+    if(!adres.startsWith('http://') && !adres.startsWith('https://')) {
+        adres = 'https://' + adres;
+    }
+    window.open(adres, '_blank');
 }
 
 // KAYDET FONKSİYONLARI
@@ -1423,9 +1538,9 @@ function adimGuncelle() {
         }
     });
     
-    var yuzde = (tamamlanan / 8) * 100;
+    var yuzde = (tamamlanan / 6) * 100;
     
-    document.getElementById('progressText').textContent = tamamlanan + ' / 8 adım tamamlandı';
+    document.getElementById('progressText').textContent = tamamlanan + ' / 6 adım tamamlandı';
     document.getElementById('progressFill').style.width = yuzde + '%';
 }
 
@@ -1612,6 +1727,10 @@ async function godaddyDnsOlustur(domain, ip, cname) {
     }
 }
 </script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 </body>
 </html>
